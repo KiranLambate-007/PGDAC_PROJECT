@@ -45,8 +45,8 @@ const AppContent = () => {
     switch (activeTab) {
       case 'search':
         return <BookingFlow />;
-      case 'tickets':
-        return <TicketList />;
+     case 'tickets':
+  return <TicketList onActionTabChange={setActiveTab} />;
       case 'postpone':
         return <PostponeTicket />;
       case 'transfer':

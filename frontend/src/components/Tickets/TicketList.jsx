@@ -3,7 +3,7 @@ import { Ticket as TicketIcon, QrCode, Calendar, MapPin, Clock } from 'lucide-re
 import { useBooking } from '../../contexts/BookingContext';
 import { useAuth } from '../../contexts/AuthContext';
 
-export const TicketList = () => {
+export const TicketList = ({ onActionTabChange }) => {
   const { tickets } = useBooking();
   const { user } = useAuth();
   const [filter, setFilter] = useState('all');
@@ -122,21 +122,31 @@ export const TicketList = () => {
                   </div>
                 </div>
 
-                {ticket.status === 'active' && (
-                  <div className="mt-4 pt-4 border-t border-gray-200">
-                    <div className="flex flex-wrap gap-2">
-                      <button className="text-sm bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full hover:bg-yellow-200 transition-colors">
-                        Postpone
-                      </button>
-                      <button className="text-sm bg-blue-100 text-blue-800 px-3 py-1 rounded-full hover:bg-blue-200 transition-colors">
-                        Transfer
-                      </button>
-                      <button className="text-sm bg-red-100 text-red-800 px-3 py-1 rounded-full hover:bg-red-200 transition-colors">
-                        Cancel
-                      </button>
-                    </div>
-                  </div>
-                )}
+                            {ticket.status === 'active' && (
+              <div className="mt-4 pt-4 border-t border-gray-200">
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    onClick={() => onActionTabChange('postpone')}
+                    className="text-sm bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full hover:bg-yellow-200 transition-colors"
+                  >
+                    Postpone
+                  </button>
+                  <button
+                    onClick={() => onActionTabChange('transfer')}
+                    className="text-sm bg-blue-100 text-blue-800 px-3 py-1 rounded-full hover:bg-blue-200 transition-colors"
+                  >
+                    Transfer
+                  </button>
+                  <button
+                    onClick={() => onActionTabChange('cancel')}
+                    className="text-sm bg-red-100 text-red-800 px-3 py-1 rounded-full hover:bg-red-200 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
+
               </div>
             ))}
           </div>
