@@ -50,14 +50,15 @@ public class ApplicationDbContext : DbContext
            .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<PostponedTicket>()
-    .HasOne(t => t.User)
-    .WithMany()
-    .HasForeignKey(t => t.UserId)
-    .OnDelete(DeleteBehavior.Restrict); // Or .NoAction
+           .HasOne(t => t.User)
+           .WithMany()
+           .HasForeignKey(t => t.UserId)
+           .OnDelete(DeleteBehavior.Restrict); // Or .NoAction
 
 
 
         // You can add more custom configs here if needed
+
     }
 
 
