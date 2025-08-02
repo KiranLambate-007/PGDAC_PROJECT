@@ -1,9 +1,11 @@
 using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace BookingBackend.Models;
 
 public class BusRouteAssignment
 {
+    [Key]
     public int AssignmentId { get; set; }
     public int BusId { get; set; }
     public int RouteId { get; set; }

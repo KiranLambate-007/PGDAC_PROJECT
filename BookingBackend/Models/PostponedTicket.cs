@@ -1,9 +1,11 @@
 using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace BookingBackend.Models;
 
 public class PostponedTicket
 {
+    [Key]
     public int PostponedId { get; set; }
     public int TicketId { get; set; }
     public int UserId { get; set; }

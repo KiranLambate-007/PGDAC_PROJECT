@@ -1,9 +1,18 @@
+using BookingBackend.Models; 
+using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
+
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
+
+
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlite("Data Source=booking.db"));
+
+
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
