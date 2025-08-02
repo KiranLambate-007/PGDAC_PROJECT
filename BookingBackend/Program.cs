@@ -1,6 +1,6 @@
 using BookingBackend.Models; 
 using Microsoft.EntityFrameworkCore;
-using BookingBackend; // Replace with your actual namespace
+//using BookingBackend; // Replace with your actual namespace
 var builder = WebApplication.CreateBuilder(args);
 
 
@@ -9,11 +9,13 @@ var builder = WebApplication.CreateBuilder(args);
 
 //builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-var app = builder.Build();
+
 
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+var app = builder.Build();
 
 
 //builder.Services.AddDbContext<ApplicationDbContext>(options =>

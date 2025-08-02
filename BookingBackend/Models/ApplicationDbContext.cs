@@ -18,24 +18,24 @@ public class ApplicationDbContext : DbContext
     public DbSet<Payment> Payments { get; set; }
     public DbSet<QRTicket> QRTickets { get; set; }
     public DbSet<PostponedTicket> PostponedTickets { get; set; }
-    
+
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
-{
-    base.OnModelCreating(modelBuilder);
+    {
+        base.OnModelCreating(modelBuilder);
 
-    modelBuilder.Entity<TicketTransfer>()
-        .HasOne(t => t.FromUser)
-        .WithMany()
-        .HasForeignKey(t => t.FromUserId)
-        .OnDelete(DeleteBehavior.Restrict); // Optional: avoids cascading issues
+        modelBuilder.Entity<TicketTransfer>()
+            .HasOne(t => t.FromUser)
+            .WithMany()
+            .HasForeignKey(t => t.FromUserId)
+            .OnDelete(DeleteBehavior.Restrict); // Optional: avoids cascading issues
 
-    modelBuilder.Entity<TicketTransfer>()
-        .HasOne(t => t.ToUser)
-        .WithMany()
-        .HasForeignKey(t => t.ToUserId)
-        .OnDelete(DeleteBehavior.Restrict);
+        modelBuilder.Entity<TicketTransfer>()
+            .HasOne(t => t.ToUser)
+            .WithMany()
+            .HasForeignKey(t => t.ToUserId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<Feedback>()
             .HasOne(t => t.Ticket)
