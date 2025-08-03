@@ -19,6 +19,9 @@ public class ApplicationDbContext : DbContext
     public DbSet<QRTicket> QRTickets { get; set; }
     public DbSet<PostponedTicket> PostponedTickets { get; set; }
 
+    public DbSet<CancelledTicket> Cancellations { get; set; }
+
+
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -55,6 +58,9 @@ public class ApplicationDbContext : DbContext
            .HasForeignKey(t => t.UserId)
            .OnDelete(DeleteBehavior.Restrict); // Or .NoAction
 
+        modelBuilder.Entity<Payment>()
+            .Property(p => p.Amount)
+            .HasPrecision(18, 2); // Or whatever fits your use case
 
 
         // You can add more custom configs here if needed

@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BookingBackend.Models;
 
@@ -14,6 +15,10 @@ public class TicketTransfer
     public string Status { get; set; }
 
     public Ticket Ticket { get; set; }
+
+    [ForeignKey("FromUserId")]
     public User FromUser { get; set; }
+
+    [ForeignKey("ToUserId")]
     public User ToUser { get; set; }
 }
