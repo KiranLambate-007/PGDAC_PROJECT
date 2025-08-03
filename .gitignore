@@ -1,2 +1,37 @@
+# Ignore node.js dependencies
 node_modules/
+
+# Ignore Visual Studio and JetBrains Rider folders
 .vs/
+.idea/
+.vscode/
+
+# Ignore build outputs and intermediate files
+bin/
+obj/
+*.exe
+*.dll
+*.pdb
+*.cache
+*.db
+*.log
+*.nuget.props
+*.nuget.targets
+*.csproj.user
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Ignore static web assets
+**/wwwroot/staticwebassets/
+**/staticwebassets/
+**/BookingBackend.staticwebassets.*
+
+# Ignore backup files
+*~
+*.bak
+
+# Ignore macOS and Linux specific files
+.DS_Store
+Thumbs.db
