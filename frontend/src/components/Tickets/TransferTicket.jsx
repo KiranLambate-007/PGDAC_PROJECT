@@ -2,16 +2,35 @@ import React, { useState } from 'react';
 import { ArrowRightLeft, User, Mail, CheckCircle, AlertTriangle } from 'lucide-react';
 import { useBooking } from '../../contexts/BookingContext';
 import { useAuth } from '../../contexts/AuthContext';
+import { ticketService } from '../../services/ticketService';
+
+// Optional: move this to a separate file like services/ticketService.js
+const transferTicketApi = async (payload) => {
+  const response = await fetch('https://localhost:5001/api/tickets/transfer', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Ticket transfer failed.');
+  }
+
+  return await response.json();
+};
 
 export const TransferTicket = () => {
   const { tickets, updateTicketStatus } = useBooking();
   const { user } = useAuth();
+
   const [selectedTicket, setSelectedTicket] = useState('');
   const [transferToEmail, setTransferToEmail] = useState('');
   const [transferToName, setTransferToName] = useState('');
   const [reason, setReason] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [error, setError] = useState('');
 
   const activeTickets = tickets.filter(
     ticket => ticket.userId === user?.id && ticket.status === 'active'
@@ -22,10 +41,19 @@ export const TransferTicket = () => {
     if (!selectedTicket || !transferToEmail || !transferToName) return;
 
     setIsProcessing(true);
+    setError('');
+    try {
+      const payload = {
+        ticketId: parseInt(selectedTicket),
+        recipientPhoneOrEmailOrUserId: transferToEmail
+      };
 
-    setTimeout(() => {
+      // await transferTicketApi(payload);
+
+      //using call through service
+      await ticketService.transferTicket(payload);
+
       updateTicketStatus(selectedTicket, 'transferred');
-      setIsProcessing(false);
       setSuccess(true);
 
       setTimeout(() => {
@@ -35,7 +63,12 @@ export const TransferTicket = () => {
         setTransferToName('');
         setReason('');
       }, 3000);
-    }, 2000);
+    } catch (err) {
+      console.error(err);
+      setError(err.message);
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const selectedTicketDetails = tickets.find(t => t.id === selectedTicket);
@@ -143,6 +176,12 @@ export const TransferTicket = () => {
                 placeholder="Please provide a reason for transferring your ticket..."
               />
             </div>
+
+            {error && (
+              <div className="text-sm text-red-600 bg-red-100 border border-red-200 p-3 rounded-md">
+                ⚠️ {error}
+              </div>
+            )}
 
             <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
               <div className="flex items-start space-x-2">
