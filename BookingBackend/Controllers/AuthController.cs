@@ -1,65 +1,56 @@
-using BookingBackend.Models;
 using Microsoft.AspNetCore.Mvc;
+using BookingBackend.Models;
 using Microsoft.EntityFrameworkCore;
+using BCrypt = BCrypt.Net.BCrypt;
+namespace BCrypt.Net.Admin;
 
-namespace BookingBackend.Controllers
+[ApiController]
+[Route("api/[controller]")]
+public class AuthController : ControllerBase
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class UsersController : ControllerBase
+    private readonly ApplicationDbContext _context;
+
+    public AuthController(ApplicationDbContext context)
     {
-        private readonly ApplicationDbContext _context;
+        _context = context;
+    }
 
-        public UsersController(ApplicationDbContext context)
+    [HttpPost("register")]
+    public async Task<IActionResult> Register([FromBody] RegisterRequest request)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+        if (existingUser != null)
+            return BadRequest("Email already registered.");
+
+        var newUser = new User
         {
-            _context = context;
-        }
+            FullName = request.FullName,
+            Email = request.Email,
+            Password = BCrypt.HashPassword(request.Password), // ✅ Hashed
+            PhoneNumber = request.PhoneNumber,
+            AadharCardNumber = request.AadharNumber
+        };
 
-        // POST: api/users/register
-        [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] User user)
-        {
-            if (user == null)
-                return BadRequest("Invalid user data.");
+        _context.Users.Add(newUser);
+        await _context.SaveChangesAsync();
 
-            // Check for duplicate email
-            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == user.Email);
-            if (existingUser != null)
-                return Conflict("A user with this email already exists.");
+        return Ok(new { message = "User registered successfully", userId = newUser.UserId });
+    }
 
-            user.CreatedAt = DateTime.UtcNow;
+    [HttpPost("login")]
+    public async Task<IActionResult> Login([FromBody] LoginRequest request)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
 
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
 
-            return Ok(new
-            {
-                message = "User registered successfully.",
-                userId = user.UserId
-            });
-        }
+        if (user == null || !BCrypt.Verify(request.Password, user.Password)) //  Verify hash
+            return Unauthorized("Invalid email or password.");
 
-        // GET: api/users/{id}
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetUser(int id)
-        {
-            var user = await _context.Users
-                .Include(u => u.Tickets)
-                .Include(u => u.Feedbacks)
-                .FirstOrDefaultAsync(u => u.UserId == id);
-
-            if (user == null)
-                return NotFound("User not found.");
-
-            return Ok(user);
-        }
-
-        // Optional: GET All Users (for admin/debug purposes)
-        [HttpGet]
-        public async Task<IActionResult> GetAllUsers()
-        {
-            var users = await _context.Users.ToListAsync();
-            return Ok(users);
-        }
+        return Ok(new { message = "Login successful", userId = user.UserId, fullName = user.FullName });
     }
 }
