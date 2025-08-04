@@ -8,6 +8,9 @@ public class ApplicationDbContext : DbContext
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
     public DbSet<User> Users { get; set; }
+
+    public DbSet<Seat> Seats { get; set; }
+
     public DbSet<Bus> Buses { get; set; }
     public DbSet<Route> Routes { get; set; }
     public DbSet<Stop> Stops { get; set; }
