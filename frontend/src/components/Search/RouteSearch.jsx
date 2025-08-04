@@ -1,81 +1,92 @@
 import React, { useState } from 'react';
 import { Search, MapPin, Calendar, Clock } from 'lucide-react';
 import { useBooking } from '../../contexts/BookingContext';
+import axios from 'axios';
 
-const mockRoutes = [
-  {
-    id: '1',
-    origin: 'Downtown Central',
-    destination: 'Airport Terminal',
-    distance: '25 km',
-    duration: '45 min',
-    price: 12.50
-  },
-  {
-    id: '2',
-    origin: 'University Campus',
-    destination: 'Shopping Mall',
-    distance: '15 km',
-    duration: '30 min',
-    price: 8.75
-  },
-  {
-    id: '3',
-    origin: 'Business District',
-    destination: 'Residential Area',
-    distance: '18 km',
-    duration: '35 min',
-    price: 9.25
-  }
-];
-
-const calculateArrivalTime = (departureTime, durationStr) => {
+const calculateArrivalTime = (departureTime, durationMinutes) => {
   const [hours, minutes] = departureTime.split(':').map(Number);
-  const durationMinutes = parseInt(durationStr); // assumes durationStr like "45 min"
-
-  const now = new Date();
-  now.setHours(hours, minutes);
-  now.setMinutes(now.getMinutes() + durationMinutes);
-
-  return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const date = new Date();
+  date.setHours(hours, minutes);
+  date.setMinutes(date.getMinutes() + parseInt(durationMinutes));
+  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 };
 
 export const RouteSearch = ({ onRouteSelect }) => {
   const [origin, setOrigin] = useState('');
   const [destination, setDestination] = useState('');
-  const [date] = useState(() => new Date().toISOString().split('T')[0]); // fixed to today
+  // Use a state variable and its setter for the date
+  const [date, setDate] = useState(() => new Date().toISOString().split('T')[0]);
   const [time, setTime] = useState('');
   const [routes, setRoutes] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const { setSelectedRoute } = useBooking();
 
   const getMinTime = () => {
+    // This function can remain the same
     const now = new Date();
-    return now.toTimeString().slice(0, 5); // "HH:MM"
+    return now.toTimeString().slice(0, 5);
   };
 
-  const handleSearch = (e) => {
+  const getMinDate = () => {
+    // This new function gets the current date in 'YYYY-MM-DD' format
+    return new Date().toISOString().split('T')[0];
+  };
+
+  const handleSearch = async (e) => {
     e.preventDefault();
+
     const now = new Date();
     const selectedDateTime = new Date(`${date}T${time}`);
-
     if (selectedDateTime <= now) {
-      alert('Please select a future time today.');
+      alert('Please select a future date or a future time today.');
       return;
     }
 
+    console.log("Searching:", { origin, destination });
     setIsSearching(true);
 
-    // Enrich routes with calculated arrival time
-    const enrichedRoutes = mockRoutes.map(route => ({
-      ...route,
-      arrivalTime: calculateArrivalTime(time, route.duration)
-    }));
+    try {
+      const response = await axios.get('https://localhost:7143/api/Bus/search', {
+        params: {
+          source: origin,
+          destination: destination,
+        },
+        validateStatus: () => true
+      });
 
-    setTimeout(() => {
+      console.log("Axios response:", response);
+      console.log("response.data:", response.data);
+
+      const backendRoutes = response.data?.$values;
+
+if (!Array.isArray(backendRoutes) || backendRoutes.length === 0) {
+  alert("No matching routes found.");
+  setRoutes([]);
+  return;
+}
+
+
+      const enrichedRoutes = backendRoutes.map((route) => {
+        const durationMinutes = route.estimatedTime?.minutes || 30;
+        return {
+          id: route.routeId,
+          origin: route.source,
+          destination: route.destination,
+          distance: `${route.distanceKm} km`,
+          duration: `${durationMinutes} min`,
+          price: 10,
+          arrivalTime: calculateArrivalTime(time, durationMinutes),
+        };
+      });
+
       setRoutes(enrichedRoutes);
+    } catch (error) {
+      console.error('Error fetching routes:', error);
+      alert('Failed to fetch routes. Please try again.');
+      setRoutes([]);
+    } finally {
       setIsSearching(false);
-    }, 1000);
+    }
   };
 
   const handleRouteSelect = (route) => {
@@ -138,8 +149,10 @@ export const RouteSearch = ({ onRouteSelect }) => {
                   id="date"
                   type="date"
                   value={date}
-                  className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md bg-gray-100 cursor-not-allowed"
-                  readOnly
+                  onChange={(e) => setDate(e.target.value)} // <-- Add this handler
+                  min={getMinDate()} // <-- Set the minimum date to today
+                  className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  required
                 />
               </div>
             </div>
@@ -155,8 +168,9 @@ export const RouteSearch = ({ onRouteSelect }) => {
                   type="time"
                   value={time}
                   onChange={(e) => setTime(e.target.value)}
+                  // Conditionally set the min time based on if the selected date is today
+                  min={date === getMinDate() ? getMinTime() : "00:00"}
                   className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  min={getMinTime()}
                   required
                 />
               </div>
