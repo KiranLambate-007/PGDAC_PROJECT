@@ -1,5 +1,5 @@
+﻿using BookingBackend.Models;
 using Microsoft.AspNetCore.Mvc;
-using BookingBackend.Models;
 using Microsoft.EntityFrameworkCore;
 
 [ApiController]
@@ -13,13 +13,41 @@ public class BusController : ControllerBase
         _context = context;
     }
 
-    [HttpGet("byRoute/{routeId}")]
-    public async Task<IActionResult> GetBusesByRoute(int routeId)
+    [HttpGet("search")]
+    public async Task<IActionResult> SearchRoutes([FromQuery] string source, [FromQuery] string destination)
     {
-        var buses = await _context.BusRouteAssignments
-            .Where(b => b.RouteId == routeId)
+        // ✅ Log incoming values
+        Console.WriteLine($"[Route Search] Source: '{source}', Destination: '{destination}'");
+
+        if (string.IsNullOrWhiteSpace(source) || string.IsNullOrWhiteSpace(destination))
+        {
+            return BadRequest("Source and destination are required.");
+        }
+
+        // ✅ Normalize input
+        string normalizedSource = source.Trim().ToLower();
+        string normalizedDestination = destination.Trim().ToLower();
+
+        // ✅ Log before query
+        Console.WriteLine("[Route Search] Normalized search...");
+
+        // ✅ Run query
+        var routes = await _context.Routes
+            .Include(r => r.BusRouteAssignments)  // Optional: include buses on the route
+            .Where(r =>
+                r.Source.ToLower().Trim() == normalizedSource &&
+                r.Destination.ToLower().Trim() == normalizedDestination)
             .ToListAsync();
 
-        return Ok(buses);
+        // ✅ Log result
+        Console.WriteLine($"[Route Search] Found {routes.Count} matching routes.");
+
+        if (!routes.Any())
+        {
+            return NotFound("No matching routes found.");
+        }
+
+        return Ok(routes);
     }
 }
+
