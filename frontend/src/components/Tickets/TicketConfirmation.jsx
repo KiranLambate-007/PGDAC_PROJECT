@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { CheckCircle, QrCode, Download, ArrowRight } from 'lucide-react';
+import QRCode from 'qrcode.react';
+import { CheckCircle, Download, ArrowRight } from 'lucide-react';
 import { useBooking } from '../../contexts/BookingContext';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -11,16 +12,17 @@ export const TicketConfirmation = ({ onStartOver }) => {
 
   useEffect(() => {
     if (selectedRoute && selectedBus && selectedSeats.length > 0 && user) {
-      // Generate tickets with QR codes
       setTimeout(() => {
         const newTickets = selectedSeats.map((seat, index) => {
+          const qrData = `ticket-${Date.now()}-${index}`; // Unique QR data string
+
           const ticket = {
-            id: `ticket-${Date.now()}-${index}`,
+            id: qrData,
             userId: user.id,
             routeId: selectedRoute.id,
             busId: selectedBus.id,
             seatNumbers: [seat.seatNumber],
-            qrCodes: [`QR-${Date.now()}-${index}`],
+            qrCodes: [qrData],  // Actual QR code data string here
             status: 'active',
             bookingDate: new Date().toISOString(),
             travelDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // Tomorrow
@@ -97,28 +99,24 @@ export const TicketConfirmation = ({ onStartOver }) => {
         ) : (
           <div className="space-y-4">
             {tickets.map((ticket, index) => (
-              <div key={ticket.id} className="border border-gray-200 rounded-lg p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-4 mb-2">
-                      <span className="font-medium text-gray-900">
-                        Ticket #{index + 1}
-                      </span>
-                      <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">
-                        {ticket.status}
-                      </span>
-                    </div>
-                    <div className="text-sm text-gray-600">
-                      <p>Seat: {ticket.seatNumbers[0]}</p>
-                      <p>QR Code: {ticket.qrCodes[0]}</p>
-                      <p>Booking ID: {ticket.id}</p>
-                    </div>
+              <div key={ticket.id} className="border border-gray-200 rounded-lg p-4 flex justify-between items-center">
+                <div className="flex-1">
+                  <div className="flex items-center space-x-4 mb-2">
+                    <span className="font-medium text-gray-900">
+                      Ticket #{index + 1}
+                    </span>
+                    <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">
+                      {ticket.status}
+                    </span>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center">
-                      <QrCode className="h-8 w-8 text-gray-600" />
-                    </div>
+                  <div className="text-sm text-gray-600">
+                    <p>Seat: {ticket.seatNumbers[0]}</p>
+                    <p>Booking ID: {ticket.id}</p>
                   </div>
+                </div>
+                <div>
+                  {/* QR code display */}
+                  <QRCode value={ticket.qrCodes[0]} size={96} fgColor="#2563eb" bgColor="#f3f4f6" />
                 </div>
               </div>
             ))}
