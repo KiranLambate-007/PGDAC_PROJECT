@@ -18,7 +18,7 @@ export const Header = ({ onMenuToggle }) => {
             </button>
             <div className="flex items-center ml-2 md:ml-0">
               <Bus className="h-8 w-8 text-blue-600" />
-              <span className="ml-2 text-xl font-bold text-gray-900">PMTML</span>
+              <span className="ml-2 text-xl font-bold text-gray-900">PMPML</span>
             </div>
           </div>
 

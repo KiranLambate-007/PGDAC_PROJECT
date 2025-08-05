@@ -14,15 +14,17 @@ export const RegisterForm = ({ onSwitchToLogin }) => {
   });
 
   const [showPassword, setShowPassword] = useState(false);
-  const [success, setSuccess] = useState('');
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
-
+  const [success, setSuccess] = useState(false);
   const { register, isLoading } = useAuth();
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setSuccess(false);
+    setIsProcessing(true);
 
     const { name, email, phone, aadharCard, password, confirmPassword } = formData;
 
@@ -63,34 +65,26 @@ export const RegisterForm = ({ onSwitchToLogin }) => {
 
       // await transferTicketApi(payload);
 
-      
+
 
       //using call through service
       const err = await registerService.registerUser(payload);
 
-    //   if (!success) {
-    //   setError('Registration failed. Please try again.');
-    // }
+      //   if (!success) {
+      //   setError('Registration failed. Please try again.');
+      // }
 
       // updateTicketStatus(selectedTicket, 'transferred');
-      // setSuccess(true);
 
-      setSuccess(err.message);
       // setError(err.message);
-
+      setSuccess(err.message);
 
       setTimeout(() => {
         setSuccess(false);
       }, 3000);
+
     } catch (err) {
       // console.error(err);
-      if (err.response && err.response.data && err.response.data.message) {
-        setError(err.response.data.message); // From server
-      } else if (err.message) {
-        setError(); // JS-level error
-      } else {
-        setError("Something went wrong.");
-      }
       setError(err.message);
     } finally {
       setIsProcessing(false);
@@ -254,6 +248,12 @@ export const RegisterForm = ({ onSwitchToLogin }) => {
 
         {error && (
           <div className="text-red-600 text-sm text-center">{error}</div>
+        )}
+
+        {success && (
+          <div className="text-green-600 text-sm text-center">
+            {success}
+          </div>
         )}
 
         <button

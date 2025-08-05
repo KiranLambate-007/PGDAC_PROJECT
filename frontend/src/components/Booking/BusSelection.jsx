@@ -11,7 +11,7 @@ const mockBuses = [
     arrivalTime: '08:45',
     availableSeats: 28,
     totalSeats: 40,
-    busType: 'Standard'
+    busType: 'Non AC'
   },
   {
     id: '2',
@@ -21,17 +21,7 @@ const mockBuses = [
     arrivalTime: '11:15',
     availableSeats: 15,
     totalSeats: 35,
-    busType: 'Premium'
-  },
-  {
-    id: '3',
-    routeId: '1',
-    busNumber: 'BUS-003',
-    departureTime: '14:00',
-    arrivalTime: '14:45',
-    availableSeats: 32,
-    totalSeats: 45,
-    busType: 'Luxury'
+    busType: 'AC'
   }
 ];
 
@@ -58,7 +48,7 @@ export const BusSelection = ({ onNext, onBack }) => {
     switch (type) {
       case 'Standard':
         return 'bg-gray-100 text-gray-800';
-      case 'Premium':
+      case 'AC':
         return 'bg-blue-100 text-blue-800';
       case 'Luxury':
         return 'bg-purple-100 text-purple-800';
@@ -116,7 +106,13 @@ export const BusSelection = ({ onNext, onBack }) => {
                       <Users className="h-4 w-4" />
                       <span>{bus.availableSeats}/{bus.totalSeats} seats available</span>
                     </div>
-                    {bus.busType !== 'Standard' && (
+                    {bus.busType !== 'AC' && (
+                      <div className="flex items-center space-x-1">
+                        <Star className="h-4 w-4 text-yellow-500" />
+                        <span>Regular Service</span>
+                      </div>
+                    )}
+                    {bus.busType !== 'Non AC' && (
                       <div className="flex items-center space-x-1">
                         <Star className="h-4 w-4 text-yellow-500" />
                         <span>Premium Service</span>

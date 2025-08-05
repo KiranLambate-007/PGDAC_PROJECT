@@ -268,6 +268,9 @@ namespace BookingBackend.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RouteId"));
 
+                    b.Property<DateTime>("DateTime")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Destination")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -277,6 +280,9 @@ namespace BookingBackend.Migrations
 
                     b.Property<TimeSpan>("EstimatedTime")
                         .HasColumnType("time");
+
+                    b.Property<float>("Price")
+                        .HasColumnType("real");
 
                     b.Property<string>("Source")
                         .IsRequired()
