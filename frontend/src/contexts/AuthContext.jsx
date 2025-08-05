@@ -1,3 +1,4 @@
+// src/contexts/AuthContext.js
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const AuthContext = createContext(undefined);
@@ -22,22 +23,32 @@ export const AuthProvider = ({ children }) => {
     setIsLoading(false);
   }, []);
 
-  const login = async (email, password) => {
+  const login = async (email, password, role) => {
     setIsLoading(true);
     try {
       await new Promise(resolve => setTimeout(resolve, 1000));
 
-      const mockUser = {
-        id: '1',
-        email,
-        name: 'John Doe',
-        phone: '+1234567890'
-      };
+      // Mock validation logic
+      if (
+        (email === 'admin@gmail.com' && password === 'admin123' && role === 'admin') ||
+        (email === 'user@gmail.com' && password === 'user123' && role === 'user')
+      ) {
+        const mockUser = {
+          id: '1',
+          email,
+          name: role === 'admin' ? 'Admin User' : 'Regular User',
+          phone: '+1234567890',
+          role,
+        };
 
-      setUser(mockUser);
-      localStorage.setItem('pmtml_user', JSON.stringify(mockUser));
-      setIsLoading(false);
-      return true;
+        setUser(mockUser);
+        localStorage.setItem('pmtml_user', JSON.stringify(mockUser));
+        setIsLoading(false);
+        return true;
+      } else {
+        setIsLoading(false);
+        return false;
+      }
     } catch (error) {
       setIsLoading(false);
       return false;
@@ -48,14 +59,13 @@ export const AuthProvider = ({ children }) => {
     setIsLoading(true);
     try {
       await new Promise(resolve => setTimeout(resolve, 1000));
-
       const mockUser = {
         id: '1',
         email,
         name,
-        phone
+        phone,
+        role: 'user', // default role
       };
-
       setUser(mockUser);
       localStorage.setItem('pmtml_user', JSON.stringify(mockUser));
       setIsLoading(false);

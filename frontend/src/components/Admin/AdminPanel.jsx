@@ -159,7 +159,7 @@ export const AdminPanel = () => {
   return (
     <div className="space-y-6">
       <div className="bg-white rounded-lg shadow-sm p-4">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">Admin Panel</h2>
+        <h2 className="text-xl font-semibold text-gray-900 mb-4">Admin Panel</h2> 
         <div className="flex flex-wrap gap-2">
           {[
             { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },

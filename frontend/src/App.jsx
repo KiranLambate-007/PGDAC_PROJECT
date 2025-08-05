@@ -1,3 +1,4 @@
+// src/App.js
 import React, { useState } from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { BookingProvider } from './contexts/BookingContext';
@@ -17,7 +18,7 @@ const AppContent = () => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('search');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [authMode, setAuthMode] = useState('login'); // 'login' | 'register'
+  const [authMode, setAuthMode] = useState('login'); // 'login' or 'register'
 
   const handleMenuToggle = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -42,19 +43,22 @@ const AppContent = () => {
   }
 
   const renderContent = () => {
+    if (user.role === 'admin') {
+      return <AdminPanel />;
+    }
+
+    // For 'user' role
     switch (activeTab) {
       case 'search':
         return <BookingFlow />;
-     case 'tickets':
-  return <TicketList onActionTabChange={setActiveTab} />;
+      case 'tickets':
+        return <TicketList onActionTabChange={setActiveTab} />;
       case 'postpone':
         return <PostponeTicket />;
       case 'transfer':
         return <TransferTicket />;
       case 'cancel':
         return <CancelTicket />;
-      case 'admin':
-        return <AdminPanel />;
       default:
         return <RouteSearch />;
     }
@@ -62,18 +66,22 @@ const AppContent = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* ✅ Always show Header */}
       <Header onMenuToggle={handleMenuToggle} />
+
       <div className="flex">
-        <Sidebar 
-          activeTab={activeTab} 
-          onTabChange={setActiveTab}
-          isOpen={isSidebarOpen}
-          onClose={handleSidebarClose}
-        />
-        <main className="flex-1 p-4 md:p-6 md:ml-0">
-          <div className="max-w-4xl mx-auto">
-            {renderContent()}
-          </div>
+        {/* ✅ Show Sidebar only if not admin */}
+        {user.role !== 'admin' && (
+          <Sidebar
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+            isOpen={isSidebarOpen}
+            onClose={handleSidebarClose}
+          />
+        )}
+
+        <main className="flex-1 p-4 md:p-6">
+          <div className="max-w-4xl mx-auto">{renderContent()}</div>
         </main>
       </div>
     </div>

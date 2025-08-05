@@ -13,7 +13,8 @@ export const Sidebar = ({
   activeTab,
   onTabChange,
   isOpen,
-  onClose
+  onClose,
+  role // 'user' or 'admin'
 }) => {
   const menuItems = [
     { id: 'search', label: 'Search Routes', icon: Search },
@@ -21,7 +22,7 @@ export const Sidebar = ({
     { id: 'postpone', label: 'Postpone Ride', icon: Calendar },
     { id: 'transfer', label: 'Transfer Ticket', icon: ArrowRightLeft },
     { id: 'cancel', label: 'Cancel & Refund', icon: XCircle },
-    { id: 'admin', label: 'Admin Panel', icon: Settings },
+    ...(role === 'admin' ? [{ id: 'admin', label: 'Admin Panel', icon: Settings }] : [])
   ];
 
   const handleItemClick = (itemId) => {
@@ -33,7 +34,6 @@ export const Sidebar = ({
 
   return (
     <>
-      {/* Mobile overlay */}
       {isOpen && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
@@ -41,7 +41,6 @@ export const Sidebar = ({
         />
       )}
 
-      {/* Sidebar */}
       <div className={`
         fixed top-16 left-0 h-[calc(100vh-4rem)] w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out z-50
         md:relative md:top-0 md:translate-x-0 md:shadow-none md:border-r md:border-gray-200
@@ -69,8 +68,7 @@ export const Sidebar = ({
                       w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-colors
                       ${activeTab === item.id
                         ? 'bg-blue-50 text-blue-700 border-r-2 border-blue-600'
-                        : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
-                      }
+                        : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'}
                     `}
                   >
                     <Icon className="h-5 w-5" />
