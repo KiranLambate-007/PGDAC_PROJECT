@@ -29,26 +29,30 @@ export const AuthProvider = ({ children }) => {
       await new Promise(resolve => setTimeout(resolve, 1000));
 
       // Mock validation logic
-      if (
-        (email === 'admin@gmail.com' && password === 'admin123' && role === 'admin') ||
-        (email === 'user@gmail.com' && password === 'user123' && role === 'user')
-      ) {
-        const mockUser = {
-          id: '1',
-          email,
-          name: role === 'admin' ? 'Admin User' : 'Regular User',
-          phone: '+1234567890',
-          role,
-        };
+      // if (
+      //   (email === 'admin@gmail.com' && password === 'admin123' && role === 'admin') ||
+      //   (email === 'user@gmail.com' && password === 'user123' && role === 'user')
+      // ) {
+      //   const mockUser = {
+      //     id: '1',
+      //     email,
+      //     name: role === 'admin' ? 'Admin User' : 'Regular User',
+      //     phone: '+1234567890',
+      //     role,
+      //   };
 
-        setUser(mockUser);
-        localStorage.setItem('pmtml_user', JSON.stringify(mockUser));
-        setIsLoading(false);
-        return true;
-      } else {
-        setIsLoading(false);
-        return false;
-      }
+      //   setUser("test");
+      //   localStorage.setItem('pmtml_user', JSON.stringify("test"));
+      //   setIsLoading(false);
+      //   return true;
+      // } else {
+      //   setIsLoading(false);
+      //   return false;
+      // }
+      setUser("test");
+      localStorage.setItem('pmtml_user', JSON.stringify("test"));
+      setIsLoading(false);
+      return true;
     } catch (error) {
       setIsLoading(false);
       return false;
