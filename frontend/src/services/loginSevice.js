@@ -1,11 +1,11 @@
 // src/services/ticketService.js
 
-const API_URL = 'https://https://localhost:7143';
+const API_URL = 'https://localhost:7143';
 
-export const ticketService = {
-    transferTicket: async (payload) => {
+export const loginService = {
+    loginUser: async (payload) => {
         try {
-            const response = await fetch(`${API_URL}/transfer`, {
+            const response = await fetch(`${API_URL}/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

@@ -1,9 +1,11 @@
 using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace BookingBackend.Models;
 
 public class QRTicket
 {
+    [Key]
     public int QRTicketId { get; set; }
     public int TicketId { get; set; }
     public string QrCodeUrl { get; set; }

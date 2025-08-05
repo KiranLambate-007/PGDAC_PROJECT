@@ -16,6 +16,5 @@ public class Ticket
 
     public User User { get; set; }
     public BusRouteAssignment Assignment { get; set; }
-
     public Bus Bus { get; set; }
 }
