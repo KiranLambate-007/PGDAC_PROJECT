@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import QRCode from 'qrcode.react';
+// import QRCode from 'qrcode.react';
+// import QRCode from 'react-qr-code';
+import { QRCodeCanvas } from 'qrcode.react';
 import { CheckCircle, Download, ArrowRight } from 'lucide-react';
 import { useBooking } from '../../contexts/BookingContext';
 import { useAuth } from '../../contexts/AuthContext';
@@ -116,7 +118,7 @@ export const TicketConfirmation = ({ onStartOver }) => {
                 </div>
                 <div>
                   {/* QR code display */}
-                  <QRCode value={ticket.qrCodes[0]} size={96} fgColor="#2563eb" bgColor="#f3f4f6" />
+                  <QRCodeCanvas value={ticket.qrCodes[0]} size={96} fgColor="#2563eb" bgColor="#f3f4f6" />
                 </div>
               </div>
             ))}

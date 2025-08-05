@@ -4,8 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using BCrypt = BCrypt.Net.BCrypt;
 namespace BCrypt.Net.Admin;
 
-[ApiController]
-[Route("api/[controller]")]
 public class AuthController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
@@ -18,12 +16,13 @@ public class AuthController : ControllerBase
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
+        //if (!ModelState.IsValid)
+        //    return BadRequest(ModelState);
 
         var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
         if (existingUser != null)
-            return BadRequest("Email already registered.");
+            //return BadRequest("Email already registered.");
+            return BadRequest(new { message = "Email already registered." });
 
         var newUser = new User
         {
@@ -43,8 +42,8 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
+        //if (!ModelState.IsValid)
+        //    return BadRequest(ModelState);
 
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
 

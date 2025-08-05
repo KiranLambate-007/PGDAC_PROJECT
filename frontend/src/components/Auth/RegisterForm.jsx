@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { User, Mail, Phone, Lock, Eye, EyeOff, Contact } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { registerService } from '../../services/registerService';
 
 export const RegisterForm = ({ onSwitchToLogin }) => {
   const [formData, setFormData] = useState({
@@ -13,8 +14,10 @@ export const RegisterForm = ({ onSwitchToLogin }) => {
   });
 
   const [showPassword, setShowPassword] = useState(false);
+  const [success, setSuccess] = useState('');
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
+
   const { register, isLoading } = useAuth();
 
   const handleSubmit = async (e) => {
@@ -43,10 +46,57 @@ export const RegisterForm = ({ onSwitchToLogin }) => {
       return;
     }
 
-    const success = await register(name, email, phone, aadharCard, password);
-    if (!success) {
-      setError('Registration failed. Please try again.');
+    // const success = await register(name, email, phone, aadharCard, password);
+    // if (!success) {
+    //   setError('Registration failed. Please try again.');
+    // }
+
+    try {
+      const payload = {
+        FullName: name,
+        Email: email,
+        // Password = BCrypt.HashPassword(request.Password), // ✅ Hashed
+        Password: password,
+        PhoneNumber: phone,
+        AadharNumber: aadharCard
+      };
+
+      // await transferTicketApi(payload);
+
+      
+
+      //using call through service
+      const err = await registerService.registerUser(payload);
+
+    //   if (!success) {
+    //   setError('Registration failed. Please try again.');
+    // }
+
+      // updateTicketStatus(selectedTicket, 'transferred');
+      // setSuccess(true);
+
+      setSuccess(err.message);
+      // setError(err.message);
+
+
+      setTimeout(() => {
+        setSuccess(false);
+      }, 3000);
+    } catch (err) {
+      // console.error(err);
+      if (err.response && err.response.data && err.response.data.message) {
+        setError(err.response.data.message); // From server
+      } else if (err.message) {
+        setError(); // JS-level error
+      } else {
+        setError("Something went wrong.");
+      }
+      setError(err.message);
+    } finally {
+      setIsProcessing(false);
     }
+
+
   };
 
   const handleInputChange = (field, value) => {
