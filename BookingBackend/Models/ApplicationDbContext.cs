@@ -24,6 +24,8 @@ public class ApplicationDbContext : DbContext
 
     public DbSet<CancelledTicket> Cancellations { get; set; }
 
+    public DbSet<RegisterRequest> RegisterRequests { get; set; }
+
 
 
 
@@ -65,13 +67,15 @@ public class ApplicationDbContext : DbContext
             .Property(p => p.Amount)
             .HasPrecision(18, 2); // Or whatever fits your use case
 
-
-        // You can add more custom configs here if needed
-
+        modelBuilder.Entity<Ticket>()
+            .HasOne(t => t.Bus)
+            .WithMany()
+            .HasForeignKey(t => t.TicketId)
+            .OnDelete(DeleteBehavior.Restrict); // 👈 This avoids cascade conflict
     }
 
 
 
-
+    // You can add more custom configs here if needed
 
 }

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { loginService } from '../../services/loginSevice';
 
 export const LoginForm = ({ onSwitchToRegister }) => {
   const [email, setEmail] = useState('');
@@ -22,6 +23,31 @@ export const LoginForm = ({ onSwitchToRegister }) => {
     if (!success) {
       setError('Invalid credentials. Please try again.');
     }
+
+    try {
+          const payload = {
+            Email: email,
+            Password: password
+          };
+    
+          // await transferTicketApi(payload);
+    
+          //using call through service
+          await loginService.loginUser(payload);
+          setSuccess(true);
+    
+          setTimeout(() => {
+            setSuccess(false);
+          }, 3000);
+        } catch (err) {
+          console.error(err);
+          setError(err.message);
+        } finally {
+          setIsProcessing(false);
+        }
+
+
+
   };
 
   return (
