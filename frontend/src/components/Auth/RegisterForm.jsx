@@ -18,49 +18,66 @@ export const RegisterForm = ({ onSwitchToLogin }) => {
   const [error, setError] = useState('');
   const { isLoading } = useAuth();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+  setError('');
+  setSuccess('');
 
-    const { name, email, phone, password, confirmPassword } = formData;
+  const { name, email, phone, password, confirmPassword } = formData;
 
-    if (!name || !email || !phone || !password || !confirmPassword) {
-      setError('Please fill in all fields');
-      return;
+  if (!name || !email || !phone || !password || !confirmPassword) {
+    setError('Please fill in all fields');
+    return;
+  }
+
+  // ✅ Gmail validation
+  if (!email.toLowerCase().endsWith('@gmail.com')) {
+    setError('Only Gmail addresses are allowed (must end with @gmail.com)');
+    return;
+  }
+  if (!/^\d{10}$/.test(phone)) {
+  setError('Phone number must be exactly 10 digits');
+  return;
+}
+if (password.length < 6) {
+  setError('Password must be at least 6 characters long');
+  return;
+}
+
+if (!/(?=.*[a-zA-Z])(?=.*\d)/.test(password)) {
+  setError('Password must contain both letters and numbers');
+  return;
+}
+
+if (password !== confirmPassword) {
+  setError('Passwords do not match');
+  return;
+}
+
+
+  try {
+    const payload = {
+      FullName: name,
+      Email: email,
+      Password: password,
+      PhoneNumber: phone
+    };
+
+    const res = await registerService.registerUser(payload);
+    setSuccess(res.message || 'Registration successful!');
+
+    setTimeout(() => {
+      setSuccess('');
+    }, 3000);
+  } catch (err) {
+    if (err.response?.data?.message) {
+      setError(err.response.data.message);
+    } else {
+      setError(err.message || 'Something went wrong.');
     }
+  }
+};
 
-    if (password !== confirmPassword) {
-      setError('Passwords do not match');
-      return;
-    }
-
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters long');
-      return;
-    }
-
-    try {
-      const payload = {
-        FullName: name,
-        Email: email,
-        Password: password,
-        PhoneNumber: phone
-      };
-
-      const res = await registerService.registerUser(payload);
-      setSuccess(res.message || 'Registration successful!');
-
-      setTimeout(() => {
-        setSuccess('');
-      }, 3000);
-    } catch (err) {
-      if (err.response?.data?.message) {
-        setError(err.response.data.message);
-      } else {
-        setError(err.message || 'Something went wrong.');
-      }
-    }
-  };
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
