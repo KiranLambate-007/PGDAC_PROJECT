@@ -46,10 +46,11 @@ export const RouteSearch = ({ onRouteSelect }) => {
     setIsSearching(true);
 
     try {
-      const response = await axios.get('https://localhost:7143/api/Bus/search', {
+      const response = await axios.get('https://localhost:7143/Bus/search', {
         params: {
           source: origin,
           destination: destination,
+          datetime: selectedDateTime
         },
         validateStatus: () => true
       });
@@ -59,11 +60,11 @@ export const RouteSearch = ({ onRouteSelect }) => {
 
       const backendRoutes = response.data?.$values;
 
-if (!Array.isArray(backendRoutes) || backendRoutes.length === 0) {
-  alert("No matching routes found.");
-  setRoutes([]);
-  return;
-}
+      if (!Array.isArray(backendRoutes) || backendRoutes.length === 0) {
+        alert("No matching routes found.");
+        setRoutes([]);
+        return;
+      }
 
 
       const enrichedRoutes = backendRoutes.map((route) => {
@@ -73,8 +74,8 @@ if (!Array.isArray(backendRoutes) || backendRoutes.length === 0) {
           origin: route.source,
           destination: route.destination,
           distance: `${route.distanceKm} km`,
-          duration: `${durationMinutes} min`,
-          price: 10,
+          duration: `${route.estimatedTime} HH:MM:SS`,
+          price:  `${route.price} ₹`,
           arrivalTime: calculateArrivalTime(time, durationMinutes),
         };
       });

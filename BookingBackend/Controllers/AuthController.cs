@@ -48,7 +48,7 @@ public class AuthController : ControllerBase
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
 
         if (user == null || !BCrypt.Verify(request.Password, user.Password)) //  Verify hash
-            return Unauthorized("Invalid email or password.");
+        return Unauthorized(new { message = "Invalid email or password." });
 
         return Ok(new { message = "Login successful", userId = user.UserId, fullName = user.FullName });
     }

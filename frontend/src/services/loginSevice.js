@@ -15,7 +15,7 @@ export const loginService = {
 
             if (!response.ok) {
                 const errorData = await response.json();
-                throw new Error(errorData.message || 'Transfer failed.');
+                throw new Error(errorData.message);
             }
 
             return await response.json();
