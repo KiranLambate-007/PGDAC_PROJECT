@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { User, Mail, Phone, Lock, Eye, EyeOff, IdCard } from 'lucide-react';
+import { User, Mail, Phone, Lock, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { registerService } from '../../services/registerService';
 
@@ -8,31 +8,24 @@ export const RegisterForm = ({ onSwitchToLogin }) => {
     name: '',
     email: '',
     phone: '',
-    aadharCard: '',
     password: '',
     confirmPassword: ''
   });
 
   const [showPassword, setShowPassword] = useState(false);
-  const [success, setSuccess] = useState('');
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
-
-  const { register, isLoading } = useAuth();
+  const { isLoading } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
-    const { name, email, phone, aadharCard, password, confirmPassword } = formData;
+    const { name, email, phone, password, confirmPassword } = formData;
 
-    if (!name || !email || !phone || !aadharCard || !password) {
+    if (!name || !email || !phone || !password || !confirmPassword) {
       setError('Please fill in all fields');
-      return;
-    }
-
-    if (!/^\d{12}$/.test(aadharCard)) {
-      setError('Aadhar card number must be a 12-digit number');
       return;
     }
 
@@ -46,61 +39,31 @@ export const RegisterForm = ({ onSwitchToLogin }) => {
       return;
     }
 
-    // const success = await register(name, email, phone, aadharCard, password);
-    // if (!success) {
-    //   setError('Registration failed. Please try again.');
-    // }
-
     try {
       const payload = {
         FullName: name,
         Email: email,
-        // Password = BCrypt.HashPassword(request.Password), // ✅ Hashed
         Password: password,
-        PhoneNumber: phone,
-        AadharNumber: aadharCard
+        PhoneNumber: phone
       };
 
-      // await transferTicketApi(payload);
-
-      
-
-      //using call through service
-      const err = await registerService.registerUser(payload);
-
-    //   if (!success) {
-    //   setError('Registration failed. Please try again.');
-    // }
-
-      // updateTicketStatus(selectedTicket, 'transferred');
-      // setSuccess(true);
-
-      setSuccess(err.message);
-      // setError(err.message);
-
+      const res = await registerService.registerUser(payload);
+      setSuccess(res.message || 'Registration successful!');
 
       setTimeout(() => {
-        setSuccess(false);
+        setSuccess('');
       }, 3000);
     } catch (err) {
-      // console.error(err);
-      if (err.response && err.response.data && err.response.data.message) {
-        setError(err.response.data.message); // From server
-      } else if (err.message) {
-        setError(); // JS-level error
+      if (err.response?.data?.message) {
+        setError(err.response.data.message);
       } else {
-        setError("Something went wrong.");
+        setError(err.message || 'Something went wrong.');
       }
-      setError(err.message);
-    } finally {
-      setIsProcessing(false);
     }
-
-
   };
 
   const handleInputChange = (field, value) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   return (
@@ -110,7 +73,6 @@ export const RegisterForm = ({ onSwitchToLogin }) => {
       </h2>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-
         {/* Name Field */}
         <div>
           <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
@@ -174,28 +136,6 @@ export const RegisterForm = ({ onSwitchToLogin }) => {
           </div>
         </div>
 
-        {/* Aadhar Card Field */}
-        <div>
-          <label htmlFor="aadharCard" className="block text-sm font-medium text-gray-700 mb-1">
-            Aadhar Card Number
-          </label>
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <IdCard className="h-5 w-5 text-gray-400" />
-            </div>
-            <input
-              id="aadharCard"
-              type="text"
-              value={formData.aadharCard}
-              onChange={(e) => handleInputChange('aadharCard', e.target.value)}
-              className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter 12-digit Aadhar number"
-              maxLength="12"
-              required
-            />
-          </div>
-        </div>
-
         {/* Password Field */}
         <div>
           <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
@@ -252,8 +192,14 @@ export const RegisterForm = ({ onSwitchToLogin }) => {
           </div>
         </div>
 
+        {/* Error */}
         {error && (
           <div className="text-red-600 text-sm text-center">{error}</div>
+        )}
+
+        {/* Success */}
+        {success && (
+          <div className="text-green-600 text-sm text-center">{success}</div>
         )}
 
         <button
