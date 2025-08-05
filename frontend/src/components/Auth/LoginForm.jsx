@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Mail, Lock, Eye, EyeOff, UserCircle, Shield } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
-import { loginService } from '../../services/loginSevice';
 
 export const LoginForm = ({ onSwitchToRegister }) => {
   const [email, setEmail] = useState('');
@@ -9,7 +8,7 @@ export const LoginForm = ({ onSwitchToRegister }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [role, setRole] = useState('user');
-  const { login, isLoading } = useAuth();
+  const { login } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,32 +19,19 @@ export const LoginForm = ({ onSwitchToRegister }) => {
       return;
     }
 
-    const success = await login(email, password);
+    const success = await login(email, password, role);
     if (!success) {
-      setError('Invalid credentials. Please try again.');
-    }
-
-    try {
-      const payload = {
-        Email: email,
-        Password: password,
-        Role: role
-      };
-      await loginService.loginUser(payload);
-    } catch (err) {
-      console.error(err);
-      setError(err.message);
+      setError('Invalid credentials or role selection');
     }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100 flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-white/90 backdrop-blur-lg shadow-2xl rounded-2xl p-8 transition-all duration-300">
-        <h2 className="text-3xl font-extrabold text-center text-blue-800 mb-6 drop-shadow-sm">
+      <div className="w-full max-w-md bg-white/90 backdrop-blur-lg shadow-2xl rounded-2xl p-8">
+        <h2 className="text-3xl font-extrabold text-center text-blue-800 mb-6">
           Welcome Back 👋
         </h2>
 
-        {/* Role Toggle */}
         <div className="flex justify-center mb-6 gap-6">
           <button
             type="button"
@@ -74,7 +60,6 @@ export const LoginForm = ({ onSwitchToRegister }) => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
-          {/* Email */}
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
               Email Address
@@ -93,7 +78,6 @@ export const LoginForm = ({ onSwitchToRegister }) => {
             </div>
           </div>
 
-          {/* Password */}
           <div>
             <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
               Password
@@ -119,33 +103,26 @@ export const LoginForm = ({ onSwitchToRegister }) => {
             </div>
           </div>
 
-          {/* Error */}
-          {error && (
-            <div className="text-red-600 text-sm text-center font-medium">{error}</div>
-          )}
+          {error && <div className="text-red-600 text-sm text-center font-medium">{error}</div>}
 
-          {/* Submit */}
           <button
             type="submit"
-            disabled={isLoading}
-            className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-2 rounded-md font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-2 rounded-md font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300"
           >
-            {isLoading ? 'Signing In...' : 'Sign In'}
+            Sign In
           </button>
         </form>
 
-        {/* Register */}
-        <div className="mt-6 text-center text-sm text-gray-600">
+        <p className="mt-4 text-sm text-center text-gray-600">
           Don’t have an account?{' '}
           <button
             onClick={onSwitchToRegister}
             className="text-blue-600 hover:underline font-medium"
           >
-            Register here
+            Register
           </button>
-        </div>
+        </p>
       </div>
     </div>
   );
 };
-
