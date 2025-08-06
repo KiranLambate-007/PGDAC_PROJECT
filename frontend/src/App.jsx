@@ -15,7 +15,7 @@ import { CancelTicket } from './components/Tickets/CancelTicket';
 import { AdminPanel } from './components/Admin/AdminPanel';
 import { AboutUs } from './components/About/AboutUs';
 import { FeedbackForm } from './components/Feedback/FeedbackForm';
-
+import FeedbackPage from './pages/FeedbackPage'; 
 
 const AppContent = () => {
   const { user } = useAuth();
