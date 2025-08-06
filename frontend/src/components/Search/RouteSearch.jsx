@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Search, MapPin, Calendar, Clock } from 'lucide-react';
 import { useBooking } from '../../contexts/BookingContext';
 import axios from 'axios';
+import { routeService } from '../../services/routeService';
+import { busService } from '../../services/busService';
 
 const calculateArrivalTime = (departureTime, durationMinutes) => {
   const [hours, minutes] = departureTime.split(':').map(Number);
@@ -19,7 +21,7 @@ export const RouteSearch = ({ onRouteSelect }) => {
   const [time, setTime] = useState('');
   const [routes, setRoutes] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
-  const { setSelectedRoute } = useBooking();
+  const { setSelectedRoute, setSelectedBus} = useBooking();
 
   const getMinTime = () => {
     // This function can remain the same
@@ -75,7 +77,7 @@ export const RouteSearch = ({ onRouteSelect }) => {
           destination: route.destination,
           distance: `${route.distanceKm} km`,
           duration: `${route.estimatedTime} HH:MM:SS`,
-          price:  `${route.price} ₹`,
+          price: `${route.price} ₹`,
           arrivalTime: calculateArrivalTime(time, durationMinutes),
         };
       });
@@ -90,9 +92,24 @@ export const RouteSearch = ({ onRouteSelect }) => {
     }
   };
 
-  const handleRouteSelect = (route) => {
+  const handleRouteSelect = async (route) => {
+    // e.preventDefault();
     setSelectedRoute(route);
     onRouteSelect?.();
+    // Serach for route
+    try {
+      // const buses =  await busService.getAllBuses();
+      // const routes = await routeService.getAllRoutes(); // or however you fetch routes
+      const buses = await routeService.fetchBusesForRoute(route.id); // 🔍 Call backend
+      // setSelectedRoute(routes[0]); // ✅ Pick one route to continue flow
+      setSelectedBus(buses);
+      // setSelectedRoute(buses);
+      
+      console.log('Fetched routes:', buses);
+    } catch (error) {
+      alert('Error fetching routes: ' + error.message);
+    }
+
   };
 
   return (

@@ -14,7 +14,7 @@ public class BusController : ControllerBase
     }
 
      [HttpGet("Bus/search")]
-    public async Task<IActionResult> SearchRoutes([FromQuery] string source, [FromQuery] string destination, [FromQuery] DateTime datetime)
+    public async Task<IActionResult> SearchBuses([FromQuery] string source, [FromQuery] string destination, [FromQuery] DateTime datetime)
     {
         // ✅ Log incoming values
         Console.WriteLine($"[Route Search] Source: '{source}', Destination: '{destination}'");
@@ -50,6 +50,69 @@ public class BusController : ControllerBase
         }
 
         return Ok(routes);
+    }
+
+    [HttpGet("GetAllBus")]
+    public async Task<ActionResult<IEnumerable<Bus>>> GetAllBuses()
+    {
+        var buses = await _context.Buses
+            .Include(b => b.BusRouteAssignments)
+                .ThenInclude(bra => bra.Route)
+            .ToListAsync();
+
+        return Ok(buses);
+    }
+
+    [HttpGet("{routeId}/buses")]
+    public async Task<IActionResult> GetBusesForRoute(int routeId)
+    {
+        //var buses = await _context.BusRouteAssignments
+        //    .Where(bra => bra.RouteId == routeId)
+        //    .Include(bra => bra.Bus)
+        //    .Select(bra => new
+        //    {
+        //        bra.Bus.BusId,
+        //        bra.Bus.BusNumber,
+        //        bra.Bus.BusType,
+        //        bra.Bus.Capacity,
+        //        bra.Bus.Status,
+        //        bra.Date,
+        //        bra.StartTime
+        //    })
+        //    .ToListAsync();
+
+        // var buses = await _context.BusRouteAssignments
+        //.Include(bra => bra.Bus)
+        //.Where(bra => bra.RouteId == routeId)
+        //.Select(bra => new
+        //{
+        //    bra.Bus.BusId,
+        //    bra.Bus.BusNumber,
+        //    bra.Bus.BusType,
+        //    bra.Bus.Capacity,
+        //    bra.Bus.Status,
+        //    bra.Date,
+        //    bra.StartTime
+        //}).ToListAsync();
+
+        //    if (!buses.Any())
+        //    {
+        //        return NotFound($"No buses found for Route ID {routeId}");
+        //    }
+
+        //    return Ok(buses);
+
+
+
+        var buses = await _context.Buses
+            .Include(b => b.BusRouteAssignments)
+            .Where(bra => bra.RouteId == routeId)
+            .ToListAsync();
+
+        if (!buses.Any())
+            return NotFound($"No buses assigned to route {routeId}.");
+
+        return Ok(buses);
     }
 }
 

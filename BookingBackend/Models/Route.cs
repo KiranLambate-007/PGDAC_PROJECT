@@ -15,5 +15,7 @@ public class Route
     public float Price { get; set; }
 
     public ICollection<Stop> Stops { get; set; }
+    public ICollection<Bus> Buses { get; set; }
+
     public ICollection<BusRouteAssignment> BusRouteAssignments { get; set; }
 }
