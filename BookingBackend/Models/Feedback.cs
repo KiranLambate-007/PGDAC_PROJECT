@@ -1,16 +1,25 @@
+﻿
 using System;
+using System.ComponentModel.DataAnnotations;
 
-namespace BookingBackend.Models;
-
-public class Feedback
+namespace feedback.Models
 {
-    public int FeedbackId { get; set; }
-    public int UserId { get; set; }
-    public int TicketId { get; set; }
-    public int Rating { get; set; }
-    public string Comments { get; set; }
-    public DateTime SubmittedOn { get; set; }
+    public class Feedback
+    {
+        [Key]
+        public int Id { get; set; }
 
-    public User User { get; set; }
-    public Ticket Ticket { get; set; }
+        [Required]
+        public int UserId { get; set; } // Foreign key (optional: link to User table)
+
+        [Required]
+        [StringLength(1000)]
+        public string Message { get; set; }
+
+        [Range(1, 5)]
+        public int Rating { get; set; }
+
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    }
 }
+

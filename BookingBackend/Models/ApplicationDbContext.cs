@@ -1,75 +1,17 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
+﻿using feedback.Models;
+using Microsoft.EntityFrameworkCore;
 
-namespace BookingBackend.Models
+public class ApplicationDbContext : DbContext
 {
-    public class ApplicationDbContext : DbContext
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+        : base(options)
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
-
-        public DbSet<User> Users { get; set; }
-        public DbSet<Seat> Seats { get; set; }
-        public DbSet<Bus> Buses { get; set; }
-        public DbSet<Route> Routes { get; set; }
-        public DbSet<Stop> Stops { get; set; }
-        public DbSet<BusRouteAssignment> BusRouteAssignments { get; set; }
-        public DbSet<Ticket> Tickets { get; set; }
-        public DbSet<TicketTransfer> TicketTransfers { get; set; }
-        public DbSet<Feedback> Feedbacks { get; set; }
-        public DbSet<Payment> Payments { get; set; }
-        public DbSet<QRTicket> QRTickets { get; set; }
-        public DbSet<PostponedTicket> PostponedTickets { get; set; }
-        public DbSet<CancelledTicket> Cancellations { get; set; }
-        public DbSet<RegisterRequest> RegisterRequests { get; set; }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            base.OnModelCreating(modelBuilder);
-
-            modelBuilder.Entity<TicketTransfer>()
-                .HasOne(t => t.FromUser)
-                .WithMany()
-                .HasForeignKey(t => t.FromUserId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<TicketTransfer>()
-                .HasOne(t => t.ToUser)
-                .WithMany()
-                .HasForeignKey(t => t.ToUserId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<Feedback>()
-                .HasOne(t => t.Ticket)
-                .WithMany()
-                .HasForeignKey(t => t.TicketId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<Feedback>()
-                .HasOne(t => t.User)
-                .WithMany()
-                .HasForeignKey(t => t.UserId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<PostponedTicket>()
-                .HasOne(t => t.User)
-                .WithMany()
-                .HasForeignKey(t => t.UserId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<Payment>()
-                .HasOne(p => p.Ticket)
-                .WithMany()  // Or .WithOne() if one-to-one
-                .HasForeignKey(p => p.TicketId);
-
-            modelBuilder.Entity<Payment>()
-                .Property(p => p.Amount)
-                .HasPrecision(18, 2);
-
-            modelBuilder.Entity<Ticket>()
-                .HasOne(t => t.Bus)
-                .WithMany()
-                .HasForeignKey(t => t.TicketId)
-                .OnDelete(DeleteBehavior.Restrict);
-        }
     }
+
+    // Add this:
+    public DbSet<Feedback> Feedbacks { get; set; }
+
+    // Other existing tables...
 }
+
+

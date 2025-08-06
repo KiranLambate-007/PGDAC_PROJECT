@@ -1,31 +1,18 @@
+﻿using Microsoft.EntityFrameworkCore.SqlServer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
-using Microsoft.Extensions.Configuration;
-using System.IO;
+using feedback.Models;
 
-using System;
-
-namespace BookingBackend.Models
+public class ApplicationDbContextFactory : IDesignTimeDbContextFactory<ApplicationDbContext>
 {
-    public class ApplicationDbContextFactory : IDesignTimeDbContextFactory<ApplicationDbContext>
+    public ApplicationDbContext CreateDbContext(string[] args)
     {
-        public ApplicationDbContext CreateDbContext(string[] args)
-        {
-            // Build configuration
-            IConfigurationRoot configuration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json")
-                .Build();
+        var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
 
-            // Get connection string
-            var connectionString = configuration.GetConnectionString("DefaultConnection");
+        // Use your actual connection string here
+        optionsBuilder.UseSqlServer("Server=(localdb)\\MSSQLLocalDB;Database=pmpml;Trusted_Connection=True;");
 
-            // Setup options
-            var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
-            optionsBuilder.UseSqlServer(connectionString); // or UseMySql, UseSqlite etc.
-
-            return new ApplicationDbContext(optionsBuilder.Options);
-        }
+        return new ApplicationDbContext(optionsBuilder.Options);
     }
 }
 
