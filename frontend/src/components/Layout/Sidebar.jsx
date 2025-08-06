@@ -7,7 +7,8 @@ import {
   XCircle,
   Settings,
   X,
-  Info
+  Info,
+  MessageSquare
 } from 'lucide-react';
 
 export const Sidebar = ({
@@ -24,7 +25,8 @@ export const Sidebar = ({
   { id: 'transfer', label: 'Transfer Ticket', icon: ArrowRightLeft },
   { id: 'cancel', label: 'Cancel & Refund', icon: XCircle },
   ...(role === 'admin' ? [{ id: 'admin', label: 'Admin Panel', icon: Settings }] : []),
-  { id: 'about', label: 'About Us', icon: Info } 
+   { id: 'feedback', label: 'Feedback', icon: MessageSquare } ,
+  { id: 'about', label: 'About Us', icon: Info }
 ];
 
   const handleItemClick = (itemId) => {

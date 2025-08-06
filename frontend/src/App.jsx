@@ -14,6 +14,7 @@ import { TransferTicket } from './components/Tickets/TransferTicket';
 import { CancelTicket } from './components/Tickets/CancelTicket';
 import { AdminPanel } from './components/Admin/AdminPanel';
 import { AboutUs } from './components/About/AboutUs';
+import { FeedbackForm } from './components/Feedback/FeedbackForm';
 
 
 const AppContent = () => {
@@ -63,6 +64,8 @@ const AppContent = () => {
         return <CancelTicket />;
       case 'about':
         return <AboutUs />;
+      case 'feedback':
+        return <FeedbackForm />; 
       default:
         return <RouteSearch />;
     }
