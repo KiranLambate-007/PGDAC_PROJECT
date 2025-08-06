@@ -9,6 +9,9 @@ public class Bus
     public string BusType { get; set; }
     public int Capacity { get; set; }
     public string Status { get; set; }
+    public int RouteId { get; set; }
+
+    public Route Route { get; set; }
 
     public ICollection<BusRouteAssignment> BusRouteAssignments { get; set; }
 }

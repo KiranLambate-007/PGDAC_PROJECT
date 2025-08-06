@@ -8,8 +8,8 @@ using BookingBackend.Models;  // Your model namespace
 
 namespace BookingBackend.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
+    //[ApiController]
+    //[Route("api/[controller]")]
     public class BusRouteAssignmentController : ControllerBase
     {
         private readonly ApplicationDbContext _context;

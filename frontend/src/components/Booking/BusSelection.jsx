@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Clock, Users, Star } from 'lucide-react';
 import { useBooking } from '../../contexts/BookingContext';
+import { busService } from '../../services/busService';
 
 const mockBuses = [
   {
@@ -32,12 +33,34 @@ export const BusSelection = ({ onNext, onBack }) => {
 
   useEffect(() => {
     if (selectedRoute) {
+      console.log("selected bus ",selectedBus);
       setTimeout(() => {
-        setBuses(mockBuses);
+        setBuses(selectedBus.$values || []);
         setIsLoading(false);
       }, 1000);
     }
   }, [selectedRoute]);
+
+  //  useEffect(() => {
+  //   const fetchBuses = async () => {
+  //     if (!selectedRoute) return;
+
+  //     setIsLoading(true);
+  //     try {
+  //       // const allBuses = busService.getAllBuses();
+  //       // const filtered = allBuses.filter(
+  //       //   (bus) => bus.routeId === selectedRoute.routeId
+  //       // );
+  //       setBuses(buses);
+  //     } catch (error) {
+  //       console.error('Error fetching buses:', error);
+  //     } finally {
+  //       setIsLoading(false);
+  //     }
+  //   };
+
+  //   fetchBuses();
+  // }, [selectedRoute]);
 
   const handleBusSelect = (bus) => {
     setSelectedBus(bus);
@@ -98,13 +121,13 @@ export const BusSelection = ({ onNext, onBack }) => {
                   </div>
 
                   <div className="flex items-center space-x-6 text-sm text-gray-600">
-                    <div className="flex items-center space-x-1">
+                    {/* <div className="flex items-center space-x-1">
                       <Clock className="h-4 w-4" />
                       <span>{bus.departureTime} - {bus.arrivalTime}</span>
-                    </div>
+                    </div> */}
                     <div className="flex items-center space-x-1">
                       <Users className="h-4 w-4" />
-                      <span>{bus.availableSeats}/{bus.totalSeats} seats available</span>
+                      <span>{bus.availableSeats}/{bus.capacity} seats available</span>
                     </div>
                     {bus.busType !== 'AC' && (
                       <div className="flex items-center space-x-1">

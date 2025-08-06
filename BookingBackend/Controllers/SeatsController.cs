@@ -7,8 +7,8 @@ using BookingBackend.Models;
 
 namespace BookingBackend.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
+    //[ApiController]
+    //[Route("api/[controller]")]
     public class SeatController : ControllerBase
     {
         private readonly ApplicationDbContext _context;

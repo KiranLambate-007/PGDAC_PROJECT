@@ -41,11 +41,16 @@ namespace BookingBackend.Migrations
                     b.Property<int>("Capacity")
                         .HasColumnType("int");
 
+                    b.Property<int>("RouteId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("BusId");
+
+                    b.HasIndex("RouteId");
 
                     b.ToTable("Buses");
                 });
@@ -493,6 +498,17 @@ namespace BookingBackend.Migrations
                     b.ToTable("CancelledTickets");
                 });
 
+            modelBuilder.Entity("BookingBackend.Models.Bus", b =>
+                {
+                    b.HasOne("BookingBackend.Models.Route", "Route")
+                        .WithMany("Buses")
+                        .HasForeignKey("RouteId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Route");
+                });
+
             modelBuilder.Entity("BookingBackend.Models.BusRouteAssignment", b =>
                 {
                     b.HasOne("BookingBackend.Models.Bus", "Bus")
@@ -504,7 +520,7 @@ namespace BookingBackend.Migrations
                     b.HasOne("BookingBackend.Models.Route", "Route")
                         .WithMany("BusRouteAssignments")
                         .HasForeignKey("RouteId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Bus");
@@ -668,6 +684,8 @@ namespace BookingBackend.Migrations
             modelBuilder.Entity("BookingBackend.Models.Route", b =>
                 {
                     b.Navigation("BusRouteAssignments");
+
+                    b.Navigation("Buses");
 
                     b.Navigation("Stops");
                 });

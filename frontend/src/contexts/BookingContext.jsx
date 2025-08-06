@@ -6,6 +6,8 @@ export const useBooking = () => {
   const context = useContext(BookingContext);
   if (context === undefined) {
     throw new Error('useBooking must be used within a BookingProvider');
+  } else {
+    console.log("bus data ---------------------",context);
   }
   return context;
 };

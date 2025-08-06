@@ -71,5 +71,27 @@ namespace BookingBackend.Models
                 .HasForeignKey(t => t.TicketId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
+
+        modelBuilder.Entity<BusRouteAssignment>()
+       .HasOne(bra => bra.Bus)
+       .WithMany(b => b.BusRouteAssignments)
+       .HasForeignKey(bra => bra.BusId);
+
+        modelBuilder.Entity<BusRouteAssignment>()
+            .HasOne(bra => bra.Route)
+            .WithMany(r => r.BusRouteAssignments)
+            .HasForeignKey(bra => bra.RouteId);
+
+        modelBuilder.Entity<BusRouteAssignment>()
+        .HasOne(bra => bra.Route)
+        .WithMany(r => r.BusRouteAssignments)
+        .HasForeignKey(bra => bra.RouteId)
+        .OnDelete(DeleteBehavior.Restrict); // 👈 Prevents cascade delete
+
+        modelBuilder.Entity<Bus>()
+            .HasOne(b => b.Route)
+            .WithMany(r => r.Buses)
+            .HasForeignKey(b => b.RouteId)
+            .OnDelete(DeleteBehavior.Restrict); // Optional: also make this explicit
     }
 }

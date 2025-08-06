@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useBooking } from '../../contexts/BookingContext';
 
-const generateSeats = () => {
+const generateSeats = (seatPrice) => {
   const seats = [];
   const rows = 10;
-  const seatsPerRow = 4;
+  const seatsPerRow = 5;
 
   for (let row = 1; row <= rows; row++) {
     for (let seatInRow = 1; seatInRow <= seatsPerRow; seatInRow++) {
@@ -16,7 +16,7 @@ const generateSeats = () => {
         id: `${row}-${seatInRow}`,
         seatNumber,
         isOccupied,
-        price: 12.5,
+        price: seatPrice,
       });
     }
   }
@@ -26,11 +26,13 @@ const generateSeats = () => {
 
 export const SeatSelection = ({ onNext, onBack }) => {
   const [seats, setSeats] = useState([]);
-  const { selectedBus, selectedSeats, addSelectedSeat, removeSelectedSeat } = useBooking();
+  const { selectedBus, selectedSeats, addSelectedSeat, removeSelectedSeat, selectedRoute } = useBooking();
 
   useEffect(() => {
     if (selectedBus) {
-      setSeats(generateSeats());
+      const seatPrice = getNumericPrice(selectedRoute.price);
+      console.log("price -----------------------------",seatPrice);
+      setSeats(generateSeats(seatPrice));
     }
   }, [selectedBus]);
 
@@ -44,6 +46,14 @@ export const SeatSelection = ({ onNext, onBack }) => {
       addSelectedSeat(seat);
     }
   };
+
+  const getNumericPrice = (priceStr) => {
+  if (typeof priceStr === 'string') {
+    const numeric = parseFloat(priceStr.replace(/[^\d.]/g, ''));
+    return isNaN(numeric) ? 0 : numeric;
+  }
+  return typeof priceStr === 'number' ? priceStr : 0;
+};
 
   const getSeatClass = (seat) => {
     const isSelected = selectedSeats.find((s) => s.id === seat.id);
@@ -69,7 +79,7 @@ export const SeatSelection = ({ onNext, onBack }) => {
     <div className="bg-white rounded-lg shadow-md p-6">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-semibold text-gray-900">
-          Select Seats - {selectedBus.busNumber}
+          Total Seats - {selectedBus.capacity}
         </h2>
         <div className="text-sm text-gray-600">
           Selected: {selectedSeats.length}/5 seats
