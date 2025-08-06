@@ -14,7 +14,7 @@ public class User
     public string AadharCardNumber { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.Now;
 
-    public string AadharCardNumber { get; set; } = string.Empty;
+    
 
     public ICollection<Ticket> Tickets { get; set; }
     public ICollection<TicketTransfer> TransfersFrom { get; set; }

@@ -1,15 +1,17 @@
 using System;
-
-namespace BookingBackend.Models;
-
-public class Payment
+namespace BookingBackend.Models
 {
-    public int PaymentId { get; set; }
-    public int TicketId { get; set; }
-    public decimal Amount { get; set; }
-    public string Method { get; set; }
-    public string Status { get; set; }
-    public DateTime PaymentTime { get; set; }
+    public class Payment
+    {
+        public int PaymentId { get; set; }
 
-    public Ticket Ticket { get; set; }
+        public int TicketId { get; set; }  // Foreign key to Ticket table
+        public Ticket Ticket { get; set; } // Navigation property
+
+        public decimal Amount { get; set; }
+        public string PaymentMethod { get; set; } // UPI, Card, etc.
+        public string PaymentStatus { get; set; } // Success, Failed, etc.
+        public string RazorpayPaymentId { get; set; } // From Razorpay
+        public DateTime PaymentDate { get; set; } = DateTime.Now;
+    }
 }
