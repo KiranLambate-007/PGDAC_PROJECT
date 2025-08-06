@@ -13,6 +13,8 @@ import { PostponeTicket } from './components/Tickets/PostponeTicket';
 import { TransferTicket } from './components/Tickets/TransferTicket';
 import { CancelTicket } from './components/Tickets/CancelTicket';
 import { AdminPanel } from './components/Admin/AdminPanel';
+import { AboutUs } from './components/About/AboutUs';
+
 
 const AppContent = () => {
   const { user } = useAuth();
@@ -59,6 +61,8 @@ const AppContent = () => {
         return <TransferTicket />;
       case 'cancel':
         return <CancelTicket />;
+      case 'about':
+        return <AboutUs />;
       default:
         return <RouteSearch />;
     }
