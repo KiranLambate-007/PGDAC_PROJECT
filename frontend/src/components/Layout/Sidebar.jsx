@@ -6,7 +6,9 @@ import {
   ArrowRightLeft,
   XCircle,
   Settings,
-  X
+  X,
+  Info,
+  MessageSquare
 } from 'lucide-react';
 
 export const Sidebar = ({
@@ -16,14 +18,16 @@ export const Sidebar = ({
   onClose,
   role // 'user' or 'admin'
 }) => {
-  const menuItems = [
-    { id: 'search', label: 'Search Routes', icon: Search },
-    { id: 'tickets', label: 'My Tickets', icon: Ticket },
-    { id: 'postpone', label: 'Postpone Ride', icon: Calendar },
-    { id: 'transfer', label: 'Transfer Ticket', icon: ArrowRightLeft },
-    { id: 'cancel', label: 'Cancel & Refund', icon: XCircle },
-    ...(role === 'admin' ? [{ id: 'admin', label: 'Admin Panel', icon: Settings }] : [])
-  ];
+ const menuItems = [
+  { id: 'search', label: 'Search Routes', icon: Search },
+  { id: 'tickets', label: 'My Tickets', icon: Ticket },
+  { id: 'postpone', label: 'Postpone Ride', icon: Calendar },
+  { id: 'transfer', label: 'Transfer Ticket', icon: ArrowRightLeft },
+  { id: 'cancel', label: 'Cancel & Refund', icon: XCircle },
+  ...(role === 'admin' ? [{ id: 'admin', label: 'Admin Panel', icon: Settings }] : []),
+   { id: 'feedback', label: 'Feedback', icon: MessageSquare } ,
+  { id: 'about', label: 'About Us', icon: Info }
+];
 
   const handleItemClick = (itemId) => {
     onTabChange(itemId);
