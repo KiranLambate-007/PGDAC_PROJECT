@@ -1,16 +1,15 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System;
+using BookingBackend.Models;
 using System.Collections.Generic;
 using System.Linq;
-using BookingBackend.Models;
-
+using System.Threading.Tasks;
 
 namespace BookingBackend.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class PaymentController : ControllerBase
+    public class PaymentController : Controller
     {
         private readonly ApplicationDbContext _context;
 
@@ -19,82 +18,28 @@ namespace BookingBackend.Controllers
             _context = context;
         }
 
-        // GET: api/Payment
-        // Get all payments (you can restrict or paginate this in real apps)
-        [HttpGet]
-        public ActionResult<IEnumerable<Payment>> GetPayments()
+        [HttpPost]
+        public async Task<IActionResult> CreatePayment([FromBody] Payment payment)
         {
-            var payments = _context.Payments
-                .Include(p => p.Ticket)
-                .ToList();
+            if (!_context.Tickets.Any(t => t.TicketId == payment.TicketId))
+            {
+                return BadRequest("Invalid TicketId.");
+            }
 
-            return Ok(payments);
-        }
-
-        // GET: api/Payment/5
-        [HttpGet("{id}")]
-        public ActionResult<Payment> GetPayment(int id)
-        {
-            var payment = _context.Payments
-                .Include(p => p.Ticket)
-                .FirstOrDefault(p => p.PaymentId == id);
-
-            if (payment == null)
-                return NotFound();
-
+            _context.Payments.Add(payment);
+            await _context.SaveChangesAsync();
             return Ok(payment);
         }
 
-        // POST: api/Payment
-        // Save new payment record after successful payment
-        [HttpPost]
-        public ActionResult<Payment> CreatePayment([FromBody] Payment payment)
+        [HttpGet("ticket/{ticketId}")]
+        public async Task<IActionResult> GetPaymentByTicketId(int ticketId)
         {
-            if (payment == null)
-                return BadRequest("Invalid payment data");
+            var payment = await _context.Payments
+                .Where(p => p.TicketId == ticketId)
+                .FirstOrDefaultAsync();
 
-            payment.PaymentTime = DateTime.UtcNow;
-
-            _context.Payments.Add(payment);
-            _context.SaveChanges();
-
-            return CreatedAtAction(nameof(GetPayment), new { id = payment.PaymentId }, payment);
-        }
-
-        // PUT: api/Payment/5
-        // Update payment info (optional)
-        [HttpPut("{id}")]
-        public IActionResult UpdatePayment(int id, [FromBody] Payment updatedPayment)
-        {
-            if (id != updatedPayment.PaymentId)
-                return BadRequest("Payment ID mismatch");
-
-            var payment = _context.Payments.Find(id);
-            if (payment == null)
-                return NotFound();
-
-            payment.Amount = updatedPayment.Amount;
-            payment.Method = updatedPayment.Method;
-            payment.Status = updatedPayment.Status;
-            payment.PaymentTime = updatedPayment.PaymentTime;
-
-            _context.SaveChanges();
-
-            return NoContent();
-        }
-
-        // DELETE: api/Payment/5
-        [HttpDelete("{id}")]
-        public IActionResult DeletePayment(int id)
-        {
-            var payment = _context.Payments.Find(id);
-            if (payment == null)
-                return NotFound();
-
-            _context.Payments.Remove(payment);
-            _context.SaveChanges();
-
-            return NoContent();
+            if (payment == null) return NotFound();
+            return Ok(payment);
         }
     }
 }
