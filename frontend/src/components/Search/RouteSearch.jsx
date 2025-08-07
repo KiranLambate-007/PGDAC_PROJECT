@@ -51,8 +51,8 @@ export const RouteSearch = ({ onRouteSelect }) => {
       const response = await axios.get('https://localhost:7143/Bus/search', {
         params: {
           source: origin,
-          destination: destination,
-          datetime: selectedDateTime
+          destination: destination
+          //datetime: selectedDateTime
         },
         validateStatus: () => true
       });
@@ -77,7 +77,7 @@ export const RouteSearch = ({ onRouteSelect }) => {
           destination: route.destination,
           distance: `${route.distanceKm} km`,
           duration: `${route.estimatedTime} HH:MM:SS`,
-          price: `${route.price} ₹`,
+         // price: `${route.price} ₹`,
           arrivalTime: calculateArrivalTime(time, durationMinutes),
         };
       });
@@ -103,7 +103,7 @@ export const RouteSearch = ({ onRouteSelect }) => {
       const buses = await routeService.fetchBusesForRoute(route.id); // 🔍 Call backend
       // setSelectedRoute(routes[0]); // ✅ Pick one route to continue flow
       setSelectedBus(buses);
-      // setSelectedRoute(buses);
+      setSelectedRoute(route);
       
       console.log('Fetched routes:', buses);
     } catch (error) {
@@ -156,7 +156,7 @@ export const RouteSearch = ({ onRouteSelect }) => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label htmlFor="date" className="block text-sm font-medium text-gray-700 mb-1">Travel Date</label>
               <div className="relative">
@@ -193,7 +193,7 @@ export const RouteSearch = ({ onRouteSelect }) => {
                 />
               </div>
             </div>
-          </div>
+          </div> */}
 
           <button
             type="submit"
@@ -235,8 +235,8 @@ export const RouteSearch = ({ onRouteSelect }) => {
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="text-lg font-semibold text-blue-600">${route.price}</div>
-                    <div className="text-sm text-gray-500">per ticket</div>
+                    {/* <div className="text-lg font-semibold text-blue-600">${route.price}</div> */}
+                    {/* <div className="text-sm text-gray-500">per ticket</div> */}
                     <div className="text-sm text-gray-500">Arrival: {route.arrivalTime}</div>
                   </div>
                 </div>

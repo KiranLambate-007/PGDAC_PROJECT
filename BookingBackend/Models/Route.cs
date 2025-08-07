@@ -10,9 +10,9 @@ public class Route
     public float DistanceKm { get; set; }
     public TimeSpan EstimatedTime { get; set; }
 
-    public DateTime DateTime { get; set; }
+    //public DateTime DateTime { get; set; }
 
-    public float Price { get; set; }
+    //public float Price { get; set; }
 
     public ICollection<Stop> Stops { get; set; }
     public ICollection<Bus> Buses { get; set; }

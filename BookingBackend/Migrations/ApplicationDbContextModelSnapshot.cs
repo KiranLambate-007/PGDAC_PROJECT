@@ -41,6 +41,12 @@ namespace BookingBackend.Migrations
                     b.Property<int>("Capacity")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("DateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<float>("Price")
+                        .HasColumnType("real");
+
                     b.Property<int>("RouteId")
                         .HasColumnType("int");
 
@@ -72,6 +78,9 @@ namespace BookingBackend.Migrations
                     b.Property<int>("RouteId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("RouteId1")
+                        .HasColumnType("int");
+
                     b.Property<TimeSpan>("StartTime")
                         .HasColumnType("time");
 
@@ -80,6 +89,8 @@ namespace BookingBackend.Migrations
                     b.HasIndex("BusId");
 
                     b.HasIndex("RouteId");
+
+                    b.HasIndex("RouteId1");
 
                     b.ToTable("BusRouteAssignments");
                 });
@@ -134,14 +145,18 @@ namespace BookingBackend.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("Method")
+                    b.Property<DateTime>("PaymentDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PaymentMethod")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("PaymentTime")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("PaymentStatus")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Status")
+                    b.Property<string>("RazorpayPaymentId")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -273,9 +288,6 @@ namespace BookingBackend.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RouteId"));
 
-                    b.Property<DateTime>("DateTime")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Destination")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -285,9 +297,6 @@ namespace BookingBackend.Migrations
 
                     b.Property<TimeSpan>("EstimatedTime")
                         .HasColumnType("time");
-
-                    b.Property<float>("Price")
-                        .HasColumnType("real");
 
                     b.Property<string>("Source")
                         .IsRequired()
@@ -503,7 +512,7 @@ namespace BookingBackend.Migrations
                     b.HasOne("BookingBackend.Models.Route", "Route")
                         .WithMany("Buses")
                         .HasForeignKey("RouteId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Route");
@@ -518,10 +527,14 @@ namespace BookingBackend.Migrations
                         .IsRequired();
 
                     b.HasOne("BookingBackend.Models.Route", "Route")
-                        .WithMany("BusRouteAssignments")
+                        .WithMany()
                         .HasForeignKey("RouteId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("BookingBackend.Models.Route", null)
+                        .WithMany("BusRouteAssignments")
+                        .HasForeignKey("RouteId1");
 
                     b.Navigation("Bus");
 

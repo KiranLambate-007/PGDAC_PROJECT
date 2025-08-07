@@ -37,8 +37,9 @@ public class BusController : ControllerBase
             .Include(r => r.BusRouteAssignments)  // Optional: include buses on the route
             .Where(r =>
                 r.Source.ToLower().Trim() == normalizedSource &&
-                r.Destination.ToLower().Trim() == normalizedDestination &&
-                r.DateTime  > normalizedDatetime)
+                r.Destination.ToLower().Trim() == normalizedDestination 
+                //r.DateTime  > normalizedDatetime
+                )
             .ToListAsync();
 
         // ✅ Log result

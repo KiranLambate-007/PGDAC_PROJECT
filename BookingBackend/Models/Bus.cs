@@ -12,6 +12,9 @@ public class Bus
     public int RouteId { get; set; }
 
     public Route Route { get; set; }
+    public DateTime DateTime { get; set; }
+
+    public float Price { get; set; }
 
     public ICollection<BusRouteAssignment> BusRouteAssignments { get; set; }
 }
