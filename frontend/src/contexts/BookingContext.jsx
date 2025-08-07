@@ -65,6 +65,7 @@ export const BookingProvider = ({ children }) => {
         addTicket,
         updateTicketStatus,
         getTicketById,
+        setTickets
       }}
     >
       {children}

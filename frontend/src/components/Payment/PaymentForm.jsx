@@ -2,13 +2,16 @@ import React, { useState } from 'react';
 import { CreditCard, Smartphone, Building } from 'lucide-react';
 import { useBooking } from '../../contexts/BookingContext';
 import { loadRazorpay } from './RazorpayUtils';
+import { paymentService } from '../../services/paymentService';
 
 export const PaymentForm = ({ onPaymentSuccess, onBack }) => {
   const [paymentMethod, setPaymentMethod] = useState('card');
   const [isProcessing, setIsProcessing] = useState(false);
-  const { selectedSeats, selectedRoute } = useBooking();
+  const { selectedSeats, selectedRoute, tickets, selectedBus } = useBooking();
 
   const totalAmount = selectedSeats.reduce((sum, seat) => sum + seat.price, 0);
+
+  let razorpay_payment_id = 0;
 
   const handlePayment = async (e) => {
     e.preventDefault();
@@ -32,8 +35,45 @@ export const PaymentForm = ({ onPaymentSuccess, onBack }) => {
       name: "PMPML",
       description: "Bus Ticket Booking",
       handler: function (response) {
+        razorpay_payment_id = response.razorpay_payment_id;
         alert("Payment Successful: " + response.razorpay_payment_id);
+        // Delay the function until after alert is dismissed
+        setTimeout(async () => {
+          try {
+            await callDifferentApisInParallel(response);
+            onPaymentSuccess(); // Only call after all API calls succeed
+          } catch (error) {
+            console.error("Error during parallel API calls:", error);
+            alert("Payment succeeded, but there was an error completing the booking.");
+          }
+        }, 0);
         onPaymentSuccess();
+
+        // //Seat payload
+        // const payload = {
+        //   SeatNumber: selectedSeats.map(seat => seat.seatNumber).join(','),
+        //   IsOccupied: "yes",
+        //   Price: selectedSeats[0]?.price,
+        //   BusId: selectedBus.busId
+        // };
+
+        // //ticket payloaad
+        // const payload1 = {
+        //   SeatNumber: selectedSeats.map(seat => seat.seatNumber).join(','),
+        //   BookingTime: tickets[0]?.bookingDate,
+        //   IsTransferred: "N",
+        //   Status: "active"
+        // };
+
+        // // payment payload
+        // const payload2 = {
+        //   TicketId: 0,
+        //   Amount: selectedSeats[0]?.price,
+        //   PaymentMethod: "UPI",
+        //   PaymentStatus: tickets[0]?.paymentStatus,
+        //   RazorpayPaymentId: response.razorpay_payment_id,
+        //   PaymentDate: new Date().toISOString()
+        // };
       },
       prefill: {
         name: "Test User",
@@ -49,6 +89,113 @@ export const PaymentForm = ({ onPaymentSuccess, onBack }) => {
     rzp.open();
   };
 
+  //Payment api method call
+  const callDifferentApisInParallel = async () => {
+
+    //Seat payload
+    const payload = {
+      SeatNumber: selectedSeats.map(seat => seat.seatNumber).join(','),
+      IsOccupied: "yes",
+      Price: selectedSeats[0]?.price,
+      BusId: selectedBus.busId
+    };
+
+    //ticket payloaad
+    const payload1 = {
+      SeatNumber: selectedSeats.map(seat => seat.seatNumber).join(','),
+      BookingTime: tickets[0]?.bookingDate,
+      IsTransferred: "N",
+      Status: "active"
+    };
+
+    // payment payload
+    const payload2 = {
+      TicketId: 0,
+      Amount: selectedSeats[0]?.price,
+      PaymentMethod: "UPI",
+      PaymentStatus: tickets[0]?.paymentStatus || "Completed",
+      RazorpayPaymentId: razorpay_payment_id,
+      PaymentDate: new Date().toISOString()
+    };
+
+    const requests = [
+      {
+        endpoint: 'https://localhost:7143/confirm/seatBooking',
+        payload: {
+          SeatNumber: selectedSeats.map(seat => seat.seatNumber).join(','),
+          IsOccupied: true,
+          Price: parseInt(selectedSeats[0]?.price, 10),
+          BusId: selectedBus.busId
+        }
+      },
+      {
+        endpoint: 'https://localhost:7143/confirm/ticketBooking',
+        payload: {
+          SeatNumber: selectedSeats.map(seat => seat.seatNumber).join(','),
+          BookingTime: tickets.bookingDate,
+          IsTransferred: false,
+          Status: "active",
+          assignmentId: selectedBus.busRouteAssignments?.$values?.[0]?.id
+        }
+      },
+      {
+        endpoint: 'https://localhost:7143/confirm/payment',
+        payload: {
+          TicketId: 0,
+          Amount: selectedSeats[0]?.price,
+          PaymentMethod: "UPI",
+          PaymentStatus: tickets[0]?.paymentStatus,
+          RazorpayPaymentId: razorpay_payment_id,
+          PaymentDate: new Date().toISOString()
+        }
+      }
+    ];
+
+    try {
+      // const responses = await Promise.all(
+      //   // payload.ticketBookingResponse?.id,
+      //   requests.map(({ endpoint, payload }) =>
+      //     paymentService.postToEndpoint(endpoint, payload)
+      //   )
+      // );
+
+      const seatRes = await paymentService.postToEndpoint('https://localhost:7143/confirm/seatBooking', {
+        SeatNumber: selectedSeats.map(seat => seat.seatNumber).join(','),
+        IsOccupied: true,
+        Price: parseInt(selectedSeats[0]?.price, 10),
+        BusId: selectedBus.busId
+      });
+      const ticketRes = await paymentService.postToEndpoint('https://localhost:7143/confirm/ticketBooking', {
+        SeatNumber: selectedSeats.map(seat => seat.seatNumber).join(','),
+        BookingTime: tickets.bookingDate,
+        IsTransferred: false,
+        Status: "active",
+        assignmentId: selectedBus.busRouteAssignments?.$values?.[0]?.id
+      });
+      const ticketId = ticketRes?.ticketId;
+      if (!ticketId) throw new Error('Ticket ID missing');
+
+      const paymentPayload = {
+        TicketId: ticketId,
+        Amount: selectedSeats[0]?.price,
+        PaymentMethod: "UPI",
+        PaymentStatus: tickets[0]?.paymentStatus || "Completed",
+        RazorpayPaymentId: razorpay_payment_id,
+        PaymentDate: new Date().toISOString()
+      };
+
+      const paymentRes = await paymentService.postToEndpoint('https://localhost:7143/confirm/payment', paymentPayload);
+
+      console.log('Updated Payment Payload:', paymentRes);
+
+      // return responses;
+    } catch (error) {
+      console.error('At least one API call failed:', error);
+      throw error;
+    }
+  };
+
+
   const PaymentMethodCard = ({ method, icon: Icon, title, description, onSelect }) => {
     const handleClick = () => {
       setPaymentMethod(method);
@@ -59,11 +206,10 @@ export const PaymentForm = ({ onPaymentSuccess, onBack }) => {
 
     return (
       <div
-        className={`border rounded-lg p-4 cursor-pointer transition-all ${
-          paymentMethod === method
-            ? 'border-blue-500 bg-blue-50'
-            : 'border-gray-200 hover:border-gray-300'
-        }`}
+        className={`border rounded-lg p-4 cursor-pointer transition-all ${paymentMethod === method
+          ? 'border-blue-500 bg-blue-50'
+          : 'border-gray-200 hover:border-gray-300'
+          }`}
         onClick={handleClick}
       >
         <div className="flex items-center space-x-3">
@@ -197,7 +343,7 @@ export const PaymentForm = ({ onPaymentSuccess, onBack }) => {
               disabled={isProcessing}
               className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-               {isProcessing ? 'Processing...' : `Pay ₹${totalAmount.toFixed(2)}`}
+              {isProcessing ? 'Processing...' : `Pay ₹${totalAmount.toFixed(2)}`}
             </button>
           </div>
         </form>

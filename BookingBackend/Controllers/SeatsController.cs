@@ -47,16 +47,18 @@ namespace BookingBackend.Controllers
 
         // POST: api/Seat
         // Add new seat (typically admin or setup, not user booking)
-        [HttpPost]
+        //[HttpPost]
+        [HttpPost("confirm/seatBooking")]
         public ActionResult<Seat> CreateSeat([FromBody] Seat seat)
         {
             if (seat == null)
-                return BadRequest();
+            return BadRequest(new { error = "Invalid seat payload" });
 
             _context.Seats.Add(seat);
             _context.SaveChanges();
 
             return CreatedAtAction(nameof(GetSeat), new { id = seat.Id }, seat);
+
         }
 
         // PUT: api/Seat/5
@@ -96,3 +98,65 @@ namespace BookingBackend.Controllers
         }
     }
 }
+
+//using Microsoft.AspNetCore.Mvc;
+//using Microsoft.EntityFrameworkCore;
+//using BookingBackend.Models; // replace with your actual namespace
+//using System.Collections.Generic;
+//using System.Threading.Tasks;
+//using System.Linq;
+
+//namespace BookingBackend.Controllers
+//{
+//    [ApiController]
+//    [Route("api/[controller]")]
+//    public class SeatController : ControllerBase
+//    {
+//        private readonly ApplicationDbContext _context;
+
+//        public SeatController(ApplicationDbContext context)
+//        {
+//            _context = context;
+//        }
+
+//        // API to confirm booking after payment
+//        [HttpPost("confirm")]
+//        public async Task<IActionResult> ConfirmBooking([FromBody] ConfirmBookingRequest request)
+//        {
+//            // Validate input
+//            if (request == null || request.Seats == null || !request.Seats.Any())
+//            {
+//                return BadRequest("Invalid booking request.");
+//            }
+
+//            // Get the bus
+//            var bus = await _context.Buses.FindAsync(request.BusId);
+//            if (bus == null)
+//            {
+//                return NotFound("Bus not found.");
+//            }
+
+//            // Deduct occupied seats
+//            int numberOfSeatsBooked = request.Seats.Count;
+//            if (bus.TotalSeats < numberOfSeatsBooked)
+//            {
+//                return BadRequest("Not enough seats available.");
+//            }
+
+//            bus.TotalSeats -= numberOfSeatsBooked;
+
+//            // Mark each seat as occupied
+//            foreach (var seat in request.Seats)
+//            {
+//                seat.IsOccupied = true;
+//                seat.BusId = request.BusId;
+//                _context.Seats.Update(seat);
+//            }
+
+//            // Save changes
+//            await _context.SaveChangesAsync();
+
+//            return Ok(new { message = "Booking confirmed and seats updated." });
+//        }
+//    }
+//}

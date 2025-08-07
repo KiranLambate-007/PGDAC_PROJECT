@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace BookingBackend.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
+    //[ApiController]
+    //[Route("api/[controller]")]
     public class PaymentController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -18,7 +18,9 @@ namespace BookingBackend.Controllers
             _context = context;
         }
 
-        [HttpPost]
+        //[HttpPost]
+
+        [HttpPost("confirm/payment")]
         public async Task<IActionResult> CreatePayment([FromBody] Payment payment)
         {
             if (!_context.Tickets.Any(t => t.TicketId == payment.TicketId))
