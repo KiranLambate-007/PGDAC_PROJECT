@@ -30,7 +30,7 @@ export const SeatSelection = ({ onNext, onBack }) => {
 
   useEffect(() => {
     if (selectedBus) {
-      const seatPrice = getNumericPrice(selectedRoute.price);
+      const seatPrice = getNumericPrice(selectedBus.price);
       console.log("price -----------------------------",seatPrice);
       setSeats(generateSeats(seatPrice));
     }
