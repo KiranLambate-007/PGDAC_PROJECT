@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { User, Mail, Phone, Lock, Eye, EyeOff, Contact,IdCard} from 'lucide-react';
+import { User, Mail, Phone, Lock, Eye, EyeOff, Contact, CreditCard} from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { registerService } from '../../services/registerService';
+
 
 
 export const RegisterForm = ({ onSwitchToLogin }) => {
@@ -176,7 +177,7 @@ export const RegisterForm = ({ onSwitchToLogin }) => {
           </label>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <IdCard className="h-5 w-5 text-gray-400" />
+              <CreditCard  className="icon-class" />
             </div>
             <input
               id="aadharCard"
