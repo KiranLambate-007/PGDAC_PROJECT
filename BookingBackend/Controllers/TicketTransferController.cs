@@ -62,8 +62,9 @@ namespace BookingBackend.Controllers
             // Create transfer record - Pending
             var transfer = new TicketTransfer
             {
-                TicketId = ticket.TicketId,
-                FromUserId = ticket.UserId,
+                TicketId = ticket?.TicketId ?? 0, // fallback to 0 if ticket is null
+                //FromUserId = ticket.UserId,
+                FromUserId = ticket.UserId ?? 0, // or any default UserId (like -1 or throw),
                 ToUserId = recipient.UserId,
                 TransferDate = DateTime.UtcNow,
                 Status = "Pending"

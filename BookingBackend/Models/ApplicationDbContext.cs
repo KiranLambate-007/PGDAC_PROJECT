@@ -65,11 +65,11 @@ namespace BookingBackend.Models
                 .Property(p => p.Amount)
                 .HasPrecision(18, 2);
 
-            modelBuilder.Entity<Ticket>()
-                .HasOne(t => t.Bus)
-                .WithMany()
-                .HasForeignKey(t => t.TicketId)
-                .OnDelete(DeleteBehavior.Restrict);
+            //modelBuilder.Entity<Ticket>()
+            //    .HasOne(t => t.Bus)
+            //    .WithMany()
+            //    .HasForeignKey(t => t.TicketId)
+            //    .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<BusRouteAssignment>()
     .HasOne(b => b.Route)

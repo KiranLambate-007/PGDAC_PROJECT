@@ -4,8 +4,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BookingBackend.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
+    //[ApiController]
+    //[Route("api/[controller]")]
     public class TicketsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
@@ -15,20 +15,17 @@ namespace BookingBackend.Controllers
             _context = context;
         }
 
-        /// <summary>
-        /// Create multiple tickets in one API call.
-        /// </summary>
-        /// <param name="tickets">List of tickets to create</param>
-        /// <returns>Created tickets</returns>
-        [HttpPost]
-        public async Task<IActionResult> CreateTickets([FromBody] List<Ticket> tickets)
-        {
-            if (tickets == null || tickets.Count == 0)
-                return BadRequest(new { message = "No tickets provided." });
 
-            foreach (var ticket in tickets)
-            {
-                ticket.BookingTime = DateTime.UtcNow;
+        //public async Task<IActionResult> CreateTickets([FromBody] List<Ticket> tickets)
+        [HttpPost("confirm/ticketBooking")]
+        public async Task<IActionResult> CreateTickets([FromBody] Ticket ticket)
+        {
+            if (ticket == null)
+            return BadRequest(new { error = "Invalid seat payload" });
+
+            //foreach (var ticket in tickets)
+            //{
+            ticket.BookingTime = DateTime.UtcNow;
 
                 if (string.IsNullOrWhiteSpace(ticket.Status))
                     ticket.Status = "active";
@@ -36,16 +33,20 @@ namespace BookingBackend.Controllers
                 ticket.IsTransferred = false;
 
                 // Optional: Additional validation can go here
-                if (ticket.SeatNumber <= 0 || ticket.UserId <= 0 || ticket.AssignmentId <= 0)
-                {
-                    return BadRequest(new { message = "Invalid ticket data: SeatNumber, UserId and AssignmentId must be positive." });
-                }
-            }
+                //if (ticket.SeatNumber <= 0)
+                //{
+                //    return BadRequest(new { message = "Invalid ticket data: SeatNumber, UserId and AssignmentId must be positive." });
+                //}
+            //}
 
-            await _context.Tickets.AddRangeAsync(tickets);
-            await _context.SaveChangesAsync();
+            //await _context.Tickets.AddRangeAsync(tickets);
+            //await _context.SaveChangesAsync();
+            //_context.Tickets.Add(ticket);
+            //_context.SaveChanges();
+            _context.Tickets.Add(ticket);
+            await _context.SaveChangesAsync();  // Now ticket.TicketId is set by DB
 
-            return Ok(tickets);
+            return Ok(ticket);
         }
 
         /// <summary>
@@ -69,11 +70,7 @@ namespace BookingBackend.Controllers
             return Ok(tickets);
         }
 
-        /// <summary>
-        /// Get single ticket by TicketId
-        /// </summary>
-        /// <param name="ticketId">Ticket Id</param>
-        /// <returns>Ticket object</returns>
+        
         [HttpGet("{ticketId}")]
         public async Task<IActionResult> GetTicket(int ticketId)
         {
