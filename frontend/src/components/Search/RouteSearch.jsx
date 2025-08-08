@@ -76,7 +76,7 @@ export const RouteSearch = ({ onRouteSelect }) => {
           origin: route.source,
           destination: route.destination,
           distance: `${route.distanceKm} km`,
-          duration: `${route.estimatedTime} HH:MM:SS`,
+          duration: `${route.estimatedTime} `,
          // price: `${route.price} ₹`,
           arrivalTime: calculateArrivalTime(time, durationMinutes),
         };
@@ -237,7 +237,7 @@ export const RouteSearch = ({ onRouteSelect }) => {
                   <div className="text-right">
                     {/* <div className="text-lg font-semibold text-blue-600">${route.price}</div> */}
                     {/* <div className="text-sm text-gray-500">per ticket</div> */}
-                    <div className="text-sm text-gray-500">Arrival: {route.arrivalTime}</div>
+                    {/* <div className="text-sm text-gray-500">Arrival: {route.arrivalTime}</div> */}
                   </div>
                 </div>
               </div>

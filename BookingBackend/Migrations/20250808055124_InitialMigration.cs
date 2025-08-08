@@ -6,25 +6,43 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace BookingBackend.Migrations
 {
     /// <inheritdoc />
-    public partial class AddBusAndSeatModels : Migration
+    public partial class InitialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Buses",
+                name: "CancelledTickets",
                 columns: table => new
                 {
-                    BusId = table.Column<int>(type: "int", nullable: false)
+                    CancelledId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    BusNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    BusType = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Capacity = table.Column<int>(type: "int", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    TicketId = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    Reason = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CancelledAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    RefundStatus = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Buses", x => x.BusId);
+                    table.PrimaryKey("PK_CancelledTickets", x => x.CancelledId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "RegisterRequests",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    FullName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AadharNumber = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RegisterRequests", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
@@ -53,6 +71,7 @@ namespace BookingBackend.Migrations
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AadharCardNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
@@ -61,27 +80,24 @@ namespace BookingBackend.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "BusRouteAssignments",
+                name: "Buses",
                 columns: table => new
                 {
-                    AssignmentId = table.Column<int>(type: "int", nullable: false)
+                    BusId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    BusId = table.Column<int>(type: "int", nullable: false),
+                    BusNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BusType = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Capacity = table.Column<int>(type: "int", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     RouteId = table.Column<int>(type: "int", nullable: false),
-                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    StartTime = table.Column<TimeSpan>(type: "time", nullable: false)
+                    DateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Price = table.Column<float>(type: "real", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_BusRouteAssignments", x => x.AssignmentId);
+                    table.PrimaryKey("PK_Buses", x => x.BusId);
                     table.ForeignKey(
-                        name: "FK_BusRouteAssignments_Buses_BusId",
-                        column: x => x.BusId,
-                        principalTable: "Buses",
-                        principalColumn: "BusId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_BusRouteAssignments_Routes_RouteId",
+                        name: "FK_Buses_Routes_RouteId",
                         column: x => x.RouteId,
                         principalTable: "Routes",
                         principalColumn: "RouteId",
@@ -111,16 +127,74 @@ namespace BookingBackend.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "BusRouteAssignments",
+                columns: table => new
+                {
+                    AssignmentId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    BusId = table.Column<int>(type: "int", nullable: false),
+                    RouteId = table.Column<int>(type: "int", nullable: false),
+                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    StartTime = table.Column<TimeSpan>(type: "time", nullable: false),
+                    RouteId1 = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BusRouteAssignments", x => x.AssignmentId);
+                    table.ForeignKey(
+                        name: "FK_BusRouteAssignments_Buses_BusId",
+                        column: x => x.BusId,
+                        principalTable: "Buses",
+                        principalColumn: "BusId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_BusRouteAssignments_Routes_RouteId",
+                        column: x => x.RouteId,
+                        principalTable: "Routes",
+                        principalColumn: "RouteId",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_BusRouteAssignments_Routes_RouteId1",
+                        column: x => x.RouteId1,
+                        principalTable: "Routes",
+                        principalColumn: "RouteId");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Seats",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    SeatNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsOccupied = table.Column<bool>(type: "bit", nullable: false),
+                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    BusId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Seats", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Seats_Buses_BusId",
+                        column: x => x.BusId,
+                        principalTable: "Buses",
+                        principalColumn: "BusId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Tickets",
                 columns: table => new
                 {
                     TicketId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<int>(type: "int", nullable: false),
-                    AssignmentId = table.Column<int>(type: "int", nullable: false),
-                    SeatNumber = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: true),
+                    AssignmentId = table.Column<int>(type: "int", nullable: true),
+                    SeatNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     BookingTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    IsTransferred = table.Column<bool>(type: "bit", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BusId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -129,14 +203,17 @@ namespace BookingBackend.Migrations
                         name: "FK_Tickets_BusRouteAssignments_AssignmentId",
                         column: x => x.AssignmentId,
                         principalTable: "BusRouteAssignments",
-                        principalColumn: "AssignmentId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "AssignmentId");
+                    table.ForeignKey(
+                        name: "FK_Tickets_Buses_BusId",
+                        column: x => x.BusId,
+                        principalTable: "Buses",
+                        principalColumn: "BusId");
                     table.ForeignKey(
                         name: "FK_Tickets_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
-                        principalColumn: "UserId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "UserId");
                 });
 
             migrationBuilder.CreateTable(
@@ -181,10 +258,11 @@ namespace BookingBackend.Migrations
                     PaymentId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     TicketId = table.Column<int>(type: "int", nullable: false),
-                    Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Method = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PaymentTime = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    Amount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    PaymentMethod = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PaymentStatus = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RazorpayPaymentId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PaymentDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -301,6 +379,11 @@ namespace BookingBackend.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_Buses_RouteId",
+                table: "Buses",
+                column: "RouteId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_BusRouteAssignments_BusId",
                 table: "BusRouteAssignments",
                 column: "BusId");
@@ -309,6 +392,11 @@ namespace BookingBackend.Migrations
                 name: "IX_BusRouteAssignments_RouteId",
                 table: "BusRouteAssignments",
                 column: "RouteId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_BusRouteAssignments_RouteId1",
+                table: "BusRouteAssignments",
+                column: "RouteId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Feedbacks_TicketId",
@@ -346,6 +434,11 @@ namespace BookingBackend.Migrations
                 column: "TicketId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Seats_BusId",
+                table: "Seats",
+                column: "BusId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Stops_RouteId",
                 table: "Stops",
                 column: "RouteId");
@@ -354,6 +447,11 @@ namespace BookingBackend.Migrations
                 name: "IX_Tickets_AssignmentId",
                 table: "Tickets",
                 column: "AssignmentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Tickets_BusId",
+                table: "Tickets",
+                column: "BusId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Tickets_UserId",
@@ -390,6 +488,9 @@ namespace BookingBackend.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "CancelledTickets");
+
+            migrationBuilder.DropTable(
                 name: "Feedbacks");
 
             migrationBuilder.DropTable(
@@ -400,6 +501,12 @@ namespace BookingBackend.Migrations
 
             migrationBuilder.DropTable(
                 name: "QRTickets");
+
+            migrationBuilder.DropTable(
+                name: "RegisterRequests");
+
+            migrationBuilder.DropTable(
+                name: "Seats");
 
             migrationBuilder.DropTable(
                 name: "Stops");
