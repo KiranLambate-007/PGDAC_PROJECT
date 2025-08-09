@@ -1,13 +1,18 @@
-﻿using BookingBackend.Models;
+﻿using Azure.Core;
+using BookingBackend.DTO;
+using BookingBackend.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace BookingBackend.Controllers
 {
-    public class TicketTransferController : Controller
+    //[ApiController]
+    //[Route("api/[controller]")]
+    public class TicketTransferController : ControllerBase
     {
-
         private readonly ApplicationDbContext _context;
 
         public TicketTransferController(ApplicationDbContext context)
@@ -15,83 +20,124 @@ namespace BookingBackend.Controllers
             _context = context;
         }
 
-        public IActionResult Index()
+        [HttpPost("transfer")]
+        public async Task<IActionResult> TransferTicket([FromBody] TicketTransferRequest request)
         {
-            return View();
+            try
+            {
+                if (request == null)
+                    return BadRequest(new { message = "Invalid transfer request." });
+
+                var ticket = await _context.Tickets
+                    .Include(t => t.User)
+                    .FirstOrDefaultAsync(t => t.TicketId == request.TicketId);
+
+                if (ticket == null)
+                    return NotFound(new { message = "Ticket not found." });
+
+                if (ticket.Status == "Used")
+                    return BadRequest(new { message = "Ticket already used." });
+
+                if (ticket.IsTransferred)
+                    return BadRequest(new { message = "Ticket has already been transferred once." });
+
+                //var recipient = await _context.Users.FirstOrDefaultAsync(u =>
+                //    u.Email == request.ToUserId);
+
+                var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.ToUserId);
+                if (existingUser == null)
+                    //return BadRequest("Email already registered.");
+                    return BadRequest(new { message = "recipient Email not present so not transfer ticket" });
+
+                //bool recipientHasActiveTicket = await _context.Tickets.AnyAsync(t =>
+                //t.UserId == recipient.UserId &&
+                //!t.IsTransferred &&
+                //t.Status != "Used" &&
+                //t.BookingTime == ticket.BookingTime &&
+                //t.AssignmentId == ticket.AssignmentId);
+
+                //if (recipientHasActiveTicket)
+                //    return BadRequest(new { message = "Recipient already has an active ticket for this route and time." });
+
+                var transfer = new TicketTransfer
+                {
+                    TicketId = request.TicketId,
+                    FromUserId = int.Parse(request.FromUserId),
+                    ToUserId = existingUser.UserId,
+                    TransferDate = DateTime.UtcNow,
+                    Status = "Transferred"
+                };
+
+                await _context.TicketTransfers.AddAsync(transfer);
+
+                //ticket.UserId = recipient.UserId;
+                //ticket.IsTransferred = true;
+                //ticket.Status = "Transferred";
+
+                await _context.SaveChangesAsync();
+
+                //transfer.Status = "Completed";
+                //await _context.SaveChangesAsync();
+
+                Console.WriteLine($"Notification: Ticket {ticket.TicketId} transferred from User {transfer.FromUserId} to User {transfer.ToUserId}.");
+
+                return Ok(new
+                {
+                    message = "Ticket transfer successful."
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[TransferTicket] ERROR: {ex.Message}");
+                return StatusCode(500, new { message = "An unexpected error occurred during transfer.", detail = ex.Message });
+            }
         }
 
-        [HttpPost("transfer")]
-        public async Task<IActionResult> TransferTicket([FromBody] DTO.TicketTransferRequest request)
+        [HttpGet("GetAllTickets")]
+        public async Task<ActionResult<IEnumerable<Ticket>>> GetAllTickets()
         {
-            // Load ticket with owner
-            var ticket = await _context.Tickets.Include(t => t.User)
-                .FirstOrDefaultAsync(t => t.TicketId == request.TicketId);
+            var tickets = await _context.Tickets
+                .Include(b => b.Assignment)
+                    .ThenInclude(bra => bra.Route)
+                .ToListAsync();
+
+            return Ok(tickets);
+        }
+
+        [HttpPatch("update/transferUserId/{userId}")]
+        public async Task<IActionResult> UpdatetransferUserId([FromBody] TicketTransferRequest update, int userId)
+        {
+            var status = update.Status;
+            var email = update.ToUserId;
+
+            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == update.ToUserId);
+            if (existingUser == null)
+                //return BadRequest("Email already registered.");
+                return BadRequest(new { message = "recipient Email not present so not transfer ticket" });
+
+
+
+            if (status == null)
+                return BadRequest(new { error = "status in invalid" });
+
+            var ticket = await _context.Tickets.FindAsync(userId);
             if (ticket == null)
-                return NotFound("Ticket not found.");
+                return BadRequest(new { error = "ticket is not found" });
 
-            // Validate ticket eligibility
-            if (ticket.Status == "Used")
-                return BadRequest("Ticket already used.");
+            ticket.Status = status;
+            ticket.UserId = existingUser.UserId;
 
-            if (ticket.IsTransferred)
-                return BadRequest("Ticket has already been transferred once.");
-
-            if (DateTime.UtcNow > ticket.BookingTime)
-                return BadRequest("Ticket transfer window expired (start time passed).");
-
-            // Find recipient user
-            var recipient = await _context.Users.FirstOrDefaultAsync(u =>
-                u.PhoneNumber == request.RecipientPhoneOrEmailOrUserId ||
-                u.Email == request.RecipientPhoneOrEmailOrUserId ||
-                u.UserId.ToString() == request.RecipientPhoneOrEmailOrUserId);
-
-            if (recipient == null)
-                return NotFound("Recipient user not found.");
-
-            // Check recipient eligibility (no active ticket for same assignment and start time)
-            bool recipientHasActiveTicket = await _context.Tickets.AnyAsync(t =>
-                t.UserId == recipient.UserId &&
-                !t.IsTransferred &&
-                t.Status != "Used" &&
-                t.BookingTime == ticket.BookingTime &&
-                t.AssignmentId == ticket.AssignmentId);
-
-            if (recipientHasActiveTicket)
-                return BadRequest("Recipient already has an active ticket for this route and time.");
-
-            // Create transfer record - Pending
-            var transfer = new TicketTransfer
+            try
             {
-                TicketId = ticket?.TicketId ?? 0, // fallback to 0 if ticket is null
-                //FromUserId = ticket.UserId,
-                FromUserId = ticket.UserId ?? 0, // or any default UserId (like -1 or throw),
-                ToUserId = recipient.UserId,
-                TransferDate = DateTime.UtcNow,
-                Status = "Pending"
-            };
-
-            await _context.TicketTransfers.AddAsync(transfer);
-
-            // Update ticket ownership and status
-            ticket.UserId = recipient.UserId;
-            ticket.IsTransferred = true;
-            ticket.Status = "Transferred";
-
-            await _context.SaveChangesAsync();
-
-            // Mark transfer as Completed
-            transfer.Status = "Completed";
-            await _context.SaveChangesAsync();
-
-            // Simulate notifications
-            Console.WriteLine($"Notification: Ticket {ticket.TicketId} transferred from User {transfer.FromUserId} to User {transfer.ToUserId}.");
-
-            return Ok(new
+                _context.Tickets.Update(ticket);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
             {
-                Message = "Ticket transfer successful.",
-                TicketId = ticket.TicketId,
-                NewOwnerId = recipient.UserId
-            });
+                return BadRequest(new { error = "error occured while updating ticket status" });
+            }
+
+            return Ok(ticket);
         }
     }
 }

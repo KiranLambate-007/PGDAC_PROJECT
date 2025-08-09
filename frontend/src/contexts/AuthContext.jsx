@@ -7,6 +7,8 @@ export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
     throw new Error('useAuth must be used within an AuthProvider');
+  } else {
+    console.log("login data ---------------------",context);
   }
   return context;
 };
@@ -23,7 +25,7 @@ export const AuthProvider = ({ children }) => {
     setIsLoading(false);
   }, []);
 
-  const login = async (email, password, role) => {
+  const login = async (email, password, role,res) => {
     setIsLoading(true);
     try {
       await new Promise(resolve => setTimeout(resolve, 1000));
@@ -49,8 +51,9 @@ export const AuthProvider = ({ children }) => {
       //   setIsLoading(false);
       //   return false;
       // }
-      setUser("test");
+      setUser(email);
       localStorage.setItem('pmtml_user', JSON.stringify("test"));
+      localStorage.setItem('UserId', email.userId);
       setIsLoading(false);
       return true;
     } catch (error) {
@@ -83,6 +86,8 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     setUser(null);
     localStorage.removeItem('pmtml_user');
+    localStorage.removeItem('UserId');
+    
   };
 
   return (

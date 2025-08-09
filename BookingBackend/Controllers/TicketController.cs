@@ -85,5 +85,32 @@ namespace BookingBackend.Controllers
 
             return Ok(ticket);
         }
+
+        [HttpPatch("update/{userId}")]
+        public async Task<IActionResult> UpdateTicketStatus([FromBody] Ticket update, int userId)
+        {
+            var status = update.Status;
+
+            if (status == null)
+                return BadRequest(new { error = "status in invalid" });
+
+            var ticket = await _context.Tickets.FindAsync(userId);
+            if (ticket == null)
+                return BadRequest(new { error = "ticket is not found" });
+
+            ticket.Status = status;
+
+            try
+            {
+                _context.Tickets.Update(ticket);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return BadRequest(new { error = "error occured while updating ticket status" });
+            }
+
+            return Ok(ticket);
+        }
     }
 }

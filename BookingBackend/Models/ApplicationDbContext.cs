@@ -70,6 +70,11 @@ namespace BookingBackend.Models
             //    .WithMany()
             //    .HasForeignKey(t => t.TicketId)
             //    .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<CancelledTicket>()
+    .HasOne(ct => ct.Ticket)
+    .WithMany() // or specify navigation property if you add one
+    .HasForeignKey(ct => ct.TicketId)
+    .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<BusRouteAssignment>()
     .HasOne(b => b.Route)

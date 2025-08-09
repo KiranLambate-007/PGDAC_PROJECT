@@ -46,7 +46,7 @@ const AppContent = () => {
   }
 
   const renderContent = () => {
-    if (user.role === 'admin') {
+    if (user.fullName === 'admin') {
       return <AdminPanel />;
     }
 

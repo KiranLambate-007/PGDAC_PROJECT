@@ -8,22 +8,40 @@ export const PostponeTicket = () => {
   const { user } = useAuth();
   const [selectedTicket, setSelectedTicket] = useState('');
   const [newDate, setNewDate] = useState('');
+  const [email, setEmail] = useState('');
+  const [emailError, setEmailError] = useState('');
   const [reason, setReason] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [success, setSuccess] = useState(false);
 
   const activeTickets = tickets.filter(
-    ticket => ticket.userId === user && ticket.status === 'active'
+    ticket => ticket.userId === user?.id && ticket.status === 'active'
   );
+
+  const validateEmail = (value) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!regex.test(value)) {
+      setEmailError('Please enter a valid email address');
+    } else {
+      setEmailError('');
+    }
+  };
+
+  const handleEmailChange = (e) => {
+    setEmail(e.target.value);
+    validateEmail(e.target.value);
+  };
 
   const handlePostpone = async (e) => {
     e.preventDefault();
-    if (!selectedTicket || !newDate) return;
+    if (!selectedTicket || !newDate || emailError || !email) return;
 
     setIsProcessing(true);
 
     setTimeout(() => {
+      // Call your updateTicketStatus or API to handle postponing & emailing here
       updateTicketStatus(selectedTicket, 'postponed');
+
       setIsProcessing(false);
       setSuccess(true);
 
@@ -32,6 +50,7 @@ export const PostponeTicket = () => {
         setSelectedTicket('');
         setNewDate('');
         setReason('');
+        setEmail('');
       }, 3000);
     }, 2000);
   };
@@ -109,6 +128,21 @@ export const PostponeTicket = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
+                Postpone To (Email)
+              </label>
+              <input
+                type="email"
+                value={email}
+                onChange={handleEmailChange}
+                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${emailError ? 'border-red-500' : 'border-gray-300'}`}
+                placeholder="Enter recipient's email"
+                required
+              />
+              {emailError && <p className="text-red-600 text-sm mt-1">{emailError}</p>}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Reason for Postponement (Optional)
               </label>
               <textarea
@@ -137,7 +171,7 @@ export const PostponeTicket = () => {
 
             <button
               type="submit"
-              disabled={isProcessing || !selectedTicket || !newDate}
+              disabled={isProcessing || !selectedTicket || !newDate || !!emailError || !email}
               className="w-full bg-yellow-600 text-white py-2 px-4 rounded-md hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
             >
               <Clock className="h-4 w-4 mr-2" />
