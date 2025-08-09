@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
 import { CreditCard, Smartphone, Building } from 'lucide-react';
 import { useBooking } from '../../contexts/BookingContext';
+import {useAuth} from '../../contexts/AuthContext';
 import { loadRazorpay } from './RazorpayUtils';
 import { paymentService } from '../../services/paymentService';
+import { use } from 'react';
 
 export const PaymentForm = ({ onPaymentSuccess, onBack }) => {
   const [paymentMethod, setPaymentMethod] = useState('card');
   const [isProcessing, setIsProcessing] = useState(false);
   const { selectedSeats, selectedRoute, tickets, selectedBus } = useBooking();
+  const {user} = useAuth();
 
   const totalAmount = selectedSeats.reduce((sum, seat) => sum + seat.price, 0);
 
@@ -133,6 +136,7 @@ export const PaymentForm = ({ onPaymentSuccess, onBack }) => {
         payload: {
           SeatNumber: selectedSeats.map(seat => seat.seatNumber).join(','),
           BookingTime: tickets.bookingDate,
+          UserId: user.UserId,
           IsTransferred: false,
           Status: "active",
           assignmentId: selectedBus.busRouteAssignments?.$values?.[0]?.id
@@ -168,6 +172,8 @@ export const PaymentForm = ({ onPaymentSuccess, onBack }) => {
       const ticketRes = await paymentService.postToEndpoint('https://localhost:7143/confirm/ticketBooking', {
         SeatNumber: selectedSeats.map(seat => seat.seatNumber).join(','),
         BookingTime: tickets.bookingDate,
+        UserId: localStorage.getItem('UserId'),
+        BusId: selectedBus.busId,
         IsTransferred: false,
         Status: "active",
         assignmentId: selectedBus.busRouteAssignments?.$values?.[0]?.id

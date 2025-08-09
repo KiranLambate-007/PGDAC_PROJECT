@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Mail, Lock, Eye, EyeOff, UserCircle, Shield } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { loginService } from '../../services/loginSevice'; // Make sure the path and name are correct
+import { useBooking } from '../../contexts/BookingContext';
 
 export const LoginForm = ({ onSwitchToRegister }) => {
   const [email, setEmail] = useState('');

@@ -17,6 +17,7 @@ export const BookingProvider = ({ children }) => {
   const [selectedBus, setSelectedBus] = useState(null);
   const [selectedSeats, setSelectedSeats] = useState([]);
   const [tickets, setTickets] = useState([]);
+  const [selectedUser, setUser] = useState([]);
 
   const addSelectedSeat = useCallback((seat) => {
     setSelectedSeats((prev) => {
@@ -32,6 +33,15 @@ export const BookingProvider = ({ children }) => {
 
   const clearSelectedSeats = useCallback(() => {
     setSelectedSeats([]);
+  }, []);
+
+  const clearSelectedTickets = useCallback(() => {
+    setTickets([]);
+  }, []);
+
+   const AddSeletedUser = useCallback((user) => {
+    selectedUser((prev) => [...prev, user]);
+    return user.find((user) => user.id === user);
   }, []);
 
   const addTicket = useCallback((ticket) => {
@@ -65,7 +75,9 @@ export const BookingProvider = ({ children }) => {
         addTicket,
         updateTicketStatus,
         getTicketById,
-        setTickets
+        setTickets,
+        AddSeletedUser,
+        clearSelectedTickets
       }}
     >
       {children}

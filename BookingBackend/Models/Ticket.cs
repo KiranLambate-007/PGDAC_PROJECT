@@ -10,7 +10,7 @@ public class Ticket
     //internal bool IsTransferred;
 
     [Key]
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)] // ✅ ensures auto-increment
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)] //ensures auto-increment
     public int TicketId { get; set; }
     public int? UserId { get; set; }
 

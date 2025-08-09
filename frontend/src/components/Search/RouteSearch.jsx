@@ -101,7 +101,7 @@ export const RouteSearch = ({ onRouteSelect }) => {
       // const buses =  await busService.getAllBuses();
       // const routes = await routeService.getAllRoutes(); // or however you fetch routes
       const buses = await routeService.fetchBusesForRoute(route.id); // 🔍 Call backend
-      // setSelectedRoute(routes[0]); // ✅ Pick one route to continue flow
+      // setSelectedRoute(routes[0]); //Pick one route to continue flow
       setSelectedBus(buses);
       setSelectedRoute(route);
       

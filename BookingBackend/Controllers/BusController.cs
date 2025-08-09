@@ -16,7 +16,7 @@ public class BusController : ControllerBase
      [HttpGet("Bus/search")]
     public async Task<IActionResult> SearchBuses([FromQuery] string source, [FromQuery] string destination, [FromQuery] DateTime datetime)
     {
-        // ✅ Log incoming values
+        //Log incoming values
         Console.WriteLine($"[Route Search] Source: '{source}', Destination: '{destination}'");
 
         if (string.IsNullOrWhiteSpace(source) || string.IsNullOrWhiteSpace(destination))
@@ -24,15 +24,15 @@ public class BusController : ControllerBase
             return BadRequest("Source and destination, datetime are required.");
         }
 
-        // ✅ Normalize input
+        // Normalize input
         string normalizedSource = source.Trim().ToLower();
         string normalizedDestination = destination.Trim().ToLower();
         DateTime normalizedDatetime = datetime;
 
-        // ✅ Log before query
+        // Log before query
         Console.WriteLine("[Route Search] Normalized search...");
 
-        // ✅ Run query
+        // Run query
         var routes = await _context.Routes
             .Include(r => r.BusRouteAssignments)  // Optional: include buses on the route
             .Where(r =>
@@ -42,7 +42,7 @@ public class BusController : ControllerBase
                 )
             .ToListAsync();
 
-        // ✅ Log result
+        // Log result
         Console.WriteLine($"[Route Search] Found {routes.Count} matching routes.");
 
         if (!routes.Any())
