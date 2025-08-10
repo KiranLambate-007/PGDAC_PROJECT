@@ -9,15 +9,15 @@ export const FeedbackForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const payload = {
+      userId: 1,
+      ticketId: 4,
+      comments: message,
+      rating: parseInt(rating),
+    };
+
     try {
-      const feedbackData = {
-        message,
-        rating: parseInt(rating),
-        // userId: 1, // Optional if backend gets from auth token/session
-      };
-
-      await axios.post('https://localhost:7143/api/Feedbacks', feedbackData); // Replace with actual API URL
-
+      await axios.post('https://localhost:7143/api/Feedback', payload);
       setSubmitted(true);
       setMessage('');
       setRating('');
@@ -27,29 +27,39 @@ export const FeedbackForm = () => {
   };
 
   return (
-    <div className="max-w-xl mx-auto p-4 bg-white rounded-lg shadow">
-      <h2 className="text-2xl font-bold mb-4">We value your feedback</h2>
+    <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-lg">
+      <h2 className="text-2xl font-semibold mb-6 text-center">We Value Your Feedback</h2>
+
       {submitted ? (
-        <p className="text-green-600">Thank you for your feedback!</p>
+        <p className="text-green-600 font-medium text-center">Thank you for your feedback!</p>
       ) : (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <label className="block text-gray-700 font-medium mb-1" htmlFor="message">
+            Your Feedback
+          </label>
           <textarea
-            className="w-full p-3 border border-gray-300 rounded-md mb-4 resize-none"
+            id="message"
             rows="5"
+            className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
             placeholder="Write your feedback here..."
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             required
           />
 
-          <label className="block mb-2 font-medium">Rating (1 to 5)</label>
+          <label className="block text-gray-700 font-medium mb-1" htmlFor="rating">
+            Rating
+          </label>
           <select
-            className="w-full p-2 border border-gray-300 rounded-md mb-4"
+            id="rating"
+            className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
             value={rating}
             onChange={(e) => setRating(e.target.value)}
             required
           >
-            <option value="">Select rating</option>
+            <option value="" disabled>
+              Select a rating
+            </option>
             {[1, 2, 3, 4, 5].map((num) => (
               <option key={num} value={num}>
                 {num}
@@ -59,7 +69,7 @@ export const FeedbackForm = () => {
 
           <button
             type="submit"
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-md transition duration-300"
           >
             Submit Feedback
           </button>
