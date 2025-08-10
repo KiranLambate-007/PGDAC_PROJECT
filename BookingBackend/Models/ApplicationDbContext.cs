@@ -38,11 +38,11 @@ namespace BookingBackend.Models
                 .HasForeignKey(t => t.ToUserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<Feedback>()
-                .HasOne(t => t.Ticket)
-                .WithMany()
-                .HasForeignKey(t => t.TicketId)
-                .OnDelete(DeleteBehavior.Cascade);
+            //modelBuilder.Entity<Feedback>()
+            //    .HasOne(t => t.Ticket)
+            //    .WithMany()
+            //    .HasForeignKey(t => t.TicketId)
+            //    .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Feedback>()
                 .HasOne(t => t.User)

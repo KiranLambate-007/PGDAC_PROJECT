@@ -27,7 +27,7 @@ export const Header = ({ onMenuToggle }) => {
               <div className="flex items-center space-x-2">
                 <User className="h-5 w-5 text-gray-600" />
                 <span className="text-sm font-medium text-gray-700 hidden sm:block">
-                  {user.name}
+                  {localStorage.getItem('UserId')}
                 </span>
               </div>
               <button

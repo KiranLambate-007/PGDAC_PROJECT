@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BookingBackend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250808055124_InitialMigration")]
+    [Migration("20250810051807_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -96,6 +96,35 @@ namespace BookingBackend.Migrations
                     b.HasIndex("RouteId1");
 
                     b.ToTable("BusRouteAssignments");
+                });
+
+            modelBuilder.Entity("BookingBackend.Models.CancelledTicket", b =>
+                {
+                    b.Property<int>("CancelledId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CancelledId"));
+
+                    b.Property<DateTime>("CancelledAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RefundStatus")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TicketId")
+                        .HasColumnType("int");
+
+                    b.HasKey("CancelledId");
+
+                    b.HasIndex("TicketId");
+
+                    b.ToTable("CancelledTickets");
                 });
 
             modelBuilder.Entity("BookingBackend.Models.Feedback", b =>
@@ -489,36 +518,6 @@ namespace BookingBackend.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("CancelledTicket", b =>
-                {
-                    b.Property<int>("CancelledId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CancelledId"));
-
-                    b.Property<DateTime>("CancelledAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Reason")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("RefundStatus")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("TicketId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("CancelledId");
-
-                    b.ToTable("CancelledTickets");
-                });
-
             modelBuilder.Entity("BookingBackend.Models.Bus", b =>
                 {
                     b.HasOne("BookingBackend.Models.Route", "Route")
@@ -551,6 +550,17 @@ namespace BookingBackend.Migrations
                     b.Navigation("Bus");
 
                     b.Navigation("Route");
+                });
+
+            modelBuilder.Entity("BookingBackend.Models.CancelledTicket", b =>
+                {
+                    b.HasOne("BookingBackend.Models.Ticket", "Ticket")
+                        .WithMany()
+                        .HasForeignKey("TicketId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Ticket");
                 });
 
             modelBuilder.Entity("BookingBackend.Models.Feedback", b =>

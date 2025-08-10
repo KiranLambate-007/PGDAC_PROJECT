@@ -142,7 +142,7 @@ export const SeatSelection = ({ onNext, onBack }) => {
             ))}
           </div>
           <div className="text-lg font-semibold text-blue-900">
-            Total: ${(selectedSeats.length * (selectedSeats[0]?.price || 0)).toFixed(2)}
+            Total: &#8377;{(selectedSeats.length * (selectedSeats[0]?.price || 0)).toFixed(2)}
           </div>
         </div>
       )}

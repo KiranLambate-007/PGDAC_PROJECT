@@ -12,23 +12,6 @@ namespace BookingBackend.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "CancelledTickets",
-                columns: table => new
-                {
-                    CancelledId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    TicketId = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: false),
-                    Reason = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CancelledAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    RefundStatus = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_CancelledTickets", x => x.CancelledId);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "RegisterRequests",
                 columns: table => new
                 {
@@ -217,6 +200,28 @@ namespace BookingBackend.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "CancelledTickets",
+                columns: table => new
+                {
+                    CancelledId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    TicketId = table.Column<int>(type: "int", nullable: false),
+                    Reason = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CancelledAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    RefundStatus = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CancelledTickets", x => x.CancelledId);
+                    table.ForeignKey(
+                        name: "FK_CancelledTickets_Tickets_TicketId",
+                        column: x => x.TicketId,
+                        principalTable: "Tickets",
+                        principalColumn: "TicketId",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Feedbacks",
                 columns: table => new
                 {
@@ -397,6 +402,11 @@ namespace BookingBackend.Migrations
                 name: "IX_BusRouteAssignments_RouteId1",
                 table: "BusRouteAssignments",
                 column: "RouteId1");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CancelledTickets_TicketId",
+                table: "CancelledTickets",
+                column: "TicketId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Feedbacks_TicketId",

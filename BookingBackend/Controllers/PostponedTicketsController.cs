@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace BookingBackend.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
+    //[Route("api/[controller]")]
+    //[ApiController]
     public class PostponedTicketsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;

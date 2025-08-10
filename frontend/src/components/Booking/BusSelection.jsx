@@ -146,7 +146,7 @@ export const BusSelection = ({ onNext, onBack }) => {
 
                 <div className="text-right">
                   <div className="text-lg font-semibold text-blue-600">
-                    ${bus.price}
+                    &#8377;{bus.price} 
                   </div>
                   <div className="text-sm text-gray-500">per seat</div>
                 </div>

@@ -63,7 +63,7 @@ export const LoginForm = ({ onSwitchToRegister }) => {
           Welcome Back ??
         </h2>
 
-        <div className="flex justify-center mb-6 gap-6">
+        {/* <div className="flex justify-center mb-6 gap-6">
           <button
             type="button"
             onClick={() => setRole('user')}
@@ -88,7 +88,7 @@ export const LoginForm = ({ onSwitchToRegister }) => {
             <Shield className="h-5 w-5" />
             Admin
           </button>
-        </div>
+        </div> */}
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
@@ -152,7 +152,7 @@ export const LoginForm = ({ onSwitchToRegister }) => {
       </form>
 
         <p className="mt-4 text-sm text-center text-gray-600">
-          Don�t have an account?{' '}
+          Don't have an account?{' '}
           <button
             onClick={onSwitchToRegister}
             className="text-blue-600 hover:underline font-medium"

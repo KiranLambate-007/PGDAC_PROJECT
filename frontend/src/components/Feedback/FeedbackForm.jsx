@@ -11,12 +11,14 @@ export const FeedbackForm = () => {
 
     try {
       const feedbackData = {
-        message,
-        rating: parseInt(rating),
+        UserId: localStorage.getItem('UserId'),
+        Rating: parseInt(rating),
+        Comments: message,
+        SubmittedOn: new Date().toISOString()
         // userId: 1, // Optional if backend gets from auth token/session
       };
 
-      await axios.post('https://localhost:7143/api/Feedbacks', feedbackData); // Replace with actual API URL
+      await axios.post('https://localhost:7143/feedback', feedbackData); // Replace with actual API URL
 
       setSubmitted(true);
       setMessage('');
