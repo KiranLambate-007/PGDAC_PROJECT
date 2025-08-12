@@ -81,13 +81,13 @@ export const TransferTicket = () => {
       const str = selectedTicket;
       const ticketId = str.split('#')[1].split(' ')[0];
       //update status in ticket table active to cancled
-      const updateTicket = await ticketService.patchToEndpoint(`https://localhost:7143/update/transferUserId/${ticketId}`, {
+      const updateTicket = await ticketService.patchToEndpoint(`/update/transferUserId/${ticketId}`, {
         Status: "active",
         toUserId: transferToEmail,
       });
 
       // Add record in transfer ticket table
-      const addCanceledticketRes = await ticketService.postToEndpoint('https://localhost:7143/transfer', {
+      const addCanceledticketRes = await ticketService.postToEndpoint('/transfer', {
         ticketId: ticketId,
         fromUserId: localStorage.getItem('UserId'),
         toUserId: transferToEmail,

@@ -1,6 +1,7 @@
 // src/services/ticketService.js
+import {SERVER} from "../environment/configuration";
 
-const API_URL = 'https://localhost:7143';
+const API_URL = SERVER.URL;
 
 export const loginService = {
   loginUser: async (payload) => {

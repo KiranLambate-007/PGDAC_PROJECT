@@ -87,12 +87,12 @@ export const CancelTicket = () => {
       const str = selectedTicket;
       const ticketId = str.split('#')[1].split(' ')[0];
       //update status in ticket table active to cancled
-      const updateTicket = await ticketService.patchToEndpoint(`https://localhost:7143/update/${ticketId}`, {
+      const updateTicket = await ticketService.patchToEndpoint(`/update/${ticketId}`, {
         Status: "cancelled"
       });
 
       // Add record in cancle table
-      const addCanceledticketRes = await ticketService.postToEndpoint('https://localhost:7143/cancelledTickets', {
+      const addCanceledticketRes = await ticketService.postToEndpoint('/cancelledTickets', {
 
         TicketId: ticketId,
         Reason: "NA",

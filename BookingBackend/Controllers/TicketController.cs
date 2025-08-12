@@ -89,16 +89,16 @@ namespace BookingBackend.Controllers
         [HttpPatch("update/{userId}")]
         public async Task<IActionResult> UpdateTicketStatus([FromBody] Ticket update, int userId)
         {
-            var status = update.Status;
+            var time = update.BookingTime;
 
-            if (status == null)
+            if (time == null)
                 return BadRequest(new { error = "status in invalid" });
 
             var ticket = await _context.Tickets.FindAsync(userId);
             if (ticket == null)
                 return BadRequest(new { error = "ticket is not found" });
 
-            ticket.Status = status;
+            ticket.BookingTime = time;
 
             try
             {

@@ -1,6 +1,8 @@
 // src/services/ticketService.js
 
-const API_URL = 'https://localhost:7143';
+import { SERVER } from "../environment/configuration";
+
+const API_URL = SERVER.URL;
 
 export const ticketService = {
     transferTicket: async (payload) => {
@@ -51,7 +53,7 @@ export const ticketService = {
 
     postToEndpoint: async (fullUrl, payload) => {
         try {
-            const response = await fetch(fullUrl, {
+            const response = await fetch(`${API_URL}${fullUrl}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -66,14 +68,14 @@ export const ticketService = {
 
             return await response.json();
         } catch (error) {
-            console.error(`Error calling ${fullUrl}:`, error);
+            console.error(`Error calling ${API_URL}${fullUrl}:`, error);
             throw error;
         }
     },
 
     patchToEndpoint: async (fullUrl, payload) => {
         try {
-            const response = await fetch(fullUrl, {
+            const response = await fetch(`${API_URL}${fullUrl}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json'
@@ -88,7 +90,7 @@ export const ticketService = {
 
             return await response.json();
         } catch (error) {
-            console.error(`Error calling ${fullUrl}:`, error);
+            console.error(`Error calling $${API_URL}${fullUrl}:`, error);
             throw error;
         }
     }
