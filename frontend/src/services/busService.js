@@ -1,4 +1,6 @@
-const API_URL = 'https://localhost:7143';
+import {SERVER} from "../environment/configuration";
+
+const API_URL = SERVER.URL;
 
 export const busService = {
     getAllBuses: async () => {
@@ -24,7 +26,7 @@ export const busService = {
 
     getBusesByRouteId: async (id) => {
         try {
-           const response = await fetch(`${API_URL}/route/${id}`, {
+            const response = await fetch(`${API_URL}/route/${id}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json'

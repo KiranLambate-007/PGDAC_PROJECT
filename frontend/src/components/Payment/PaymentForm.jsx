@@ -163,13 +163,13 @@ export const PaymentForm = ({ onPaymentSuccess, onBack }) => {
       //   )
       // );
 
-      const seatRes = await paymentService.postToEndpoint('https://localhost:7143/confirm/seatBooking', {
+      const seatRes = await paymentService.postToEndpoint('/confirm/seatBooking', {
         SeatNumber: selectedSeats.map(seat => seat.seatNumber).join(','),
         IsOccupied: true,
         Price: parseInt(selectedSeats[0]?.price, 10),
         BusId: selectedBus.busId
       });
-      const ticketRes = await paymentService.postToEndpoint('https://localhost:7143/confirm/ticketBooking', {
+      const ticketRes = await paymentService.postToEndpoint('/confirm/ticketBooking', {
         SeatNumber: selectedSeats.map(seat => seat.seatNumber).join(','),
         BookingTime: tickets.bookingDate,
         UserId: localStorage.getItem('UserId'),
@@ -190,7 +190,7 @@ export const PaymentForm = ({ onPaymentSuccess, onBack }) => {
         PaymentDate: new Date().toISOString()
       };
 
-      const paymentRes = await paymentService.postToEndpoint('https://localhost:7143/confirm/payment', paymentPayload);
+      const paymentRes = await paymentService.postToEndpoint('/confirm/payment', paymentPayload);
 
       console.log('Updated Payment Payload:', paymentRes);
 

@@ -43,13 +43,15 @@ namespace BookingBackend.Controllers
         }
 
         // POST: api/PostponedTickets
-        [HttpPost]
-        public async Task<ActionResult<PostponedTicket>> CreatePostponedTicket(PostponedTicket ticket)
+        [HttpPost("postponeTickets")]
+        public async Task<ActionResult<PostponedTicket>> CreatePostponedTicket([FromBody] PostponedTicket ticket)
         {
-            if (!ModelState.IsValid)
+
+            if (ticket == null)
             {
                 return BadRequest(ModelState); // <-- Add this to see what's wrong
             }
+
             _context.PostponedTickets.Add(ticket);
             await _context.SaveChangesAsync();
 

@@ -4,6 +4,7 @@ import { useBooking } from '../../contexts/BookingContext';
 import axios from 'axios';
 import { routeService } from '../../services/routeService';
 import { busService } from '../../services/busService';
+import { SERVER } from '../../environment/configuration';
 
 const calculateArrivalTime = (departureTime, durationMinutes) => {
   const [hours, minutes] = departureTime.split(':').map(Number);
@@ -22,6 +23,8 @@ export const RouteSearch = ({ onRouteSelect }) => {
   const [routes, setRoutes] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const { setSelectedRoute, setSelectedBus} = useBooking();
+
+  const API_URL = SERVER.URL;
 
   const getMinTime = () => {
     // This function can remain the same
@@ -48,7 +51,7 @@ export const RouteSearch = ({ onRouteSelect }) => {
     setIsSearching(true);
 
     try {
-      const response = await axios.get('https://localhost:7143/Bus/search', {
+      const response = await axios.get(`${API_URL}/Bus/search`, {
         params: {
           source: origin,
           destination: destination

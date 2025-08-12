@@ -1,10 +1,12 @@
-const API_URL = 'https://localhost:7143';
+import { SERVER } from "../environment/configuration";
+
+const API_URL = SERVER.URL;
 
 // paymentService.js
 export const paymentService = {
     postToEndpoint: async (fullUrl, payload) => {
         try {
-            const response = await fetch(fullUrl, {
+            const response = await fetch(`${API_URL}${fullUrl}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

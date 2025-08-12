@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { SERVER } from '../../environment/configuration';
 
 export const FeedbackForm = () => {
   const [message, setMessage] = useState('');
   const [rating, setRating] = useState('');
   const [submitted, setSubmitted] = useState(false);
+
+  const API_URL = SERVER.URL;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -25,7 +28,9 @@ export const FeedbackForm = () => {
         // userId: 1, // Optional if backend gets from auth token/session
       };
 
-      await axios.post('https://localhost:7143/feedback', feedbackData); // Replace with actual API URL
+      // await axios.post('https://localhost:7143/api/Feedbacks', feedbackData); // Replace with actual API URL
+
+      await axios.post(`${API_URL}/api/Feedbacks`, feedbackData);
 
       setSubmitted(true);
       setMessage('');

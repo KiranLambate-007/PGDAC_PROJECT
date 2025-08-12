@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Calendar, Clock, AlertTriangle, CheckCircle } from 'lucide-react';
 import { useBooking } from '../../contexts/BookingContext';
 import { useAuth } from '../../contexts/AuthContext';
@@ -50,20 +50,48 @@ export const PostponeTicket = () => {
 
     setIsProcessing(true);
 
+    //code here
+
+    try {
+      const str = selectedTicket;
+      const ticketId = str.split('#')[1].split(' ')[0];
+      //update status in ticket table active to cancled
+      const updateTicket = await ticketService.patchToEndpoint(`/update/${ticketId}`, {
+        // Status: "cancelled"
+        BookingTime: new Date().toISOString()
+      });
+
+      // Add record in cancle table
+      const addCanceledticketRes = await ticketService.postToEndpoint('/postponeTickets', {
+
+        TicketId: parseInt(ticketId),
+        UserId: parseInt(localStorage.getItem('UserId')),
+        OriginalDate: selectedTicket.bookingTime,
+        NewDate: new Date().toISOString(),
+        OriginalAssignment: 0,
+        NewAssignment: 0,
+        Status: "Postpond",
+        Reason: "User Postpond",
+        RequestedAt: new Date().toISOString(),
+        UpdatedAt: new Date().toISOString()
+      });
+
+      setTimeout(() => {
+        setIsProcessing(false);
+      }, 3000);
+    } catch (err) {
+      console.error(err);
+      setError(err.message || 'cancelled failed');
+    } finally {
+      setIsProcessing(false);
+    }
+
     setTimeout(() => {
       // Call your updateTicketStatus or API to handle postponing & emailing here
-      updateTicketStatus(selectedTicket, 'postponed');
+      // updateTicketStatus(selectedTicket, 'postponed');
 
       setIsProcessing(false);
       setSuccess(true);
-
-      setTimeout(() => {
-        setSuccess(false);
-        setSelectedTicket('');
-        setNewDate('');
-        setReason('');
-        setEmail('');
-      }, 3000);
     }, 2000);
   };
 
@@ -98,10 +126,17 @@ export const PostponeTicket = () => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 required
               >
-                <option value="">Choose a ticket</option>
+                {/* <option value="">Choose a ticket</option>
                 {activeTickets.map((ticket) => (
                   <option key={ticket.id} value={ticket.id}>
-                    Ticket #{ticket.id.slice(-8)} - Seats: {ticket.seatNumbers.join(', ')} - ${ticket.totalAmount.toFixed(2)}
+                    Ticket #{ticket.id} - Seats: {ticket.seatNumbers.join(', ')} - ${ticket.totalAmount}
+                  </option> */}
+                <option value="ticket.id">Choose a ticket</option>
+                {activeTickets.map((ticket) => (
+                  <option key={ticket.id} value={ticket.id}>
+                    Ticket #{ticket.ticketId} – Seats:{' '}
+                    {ticket.seatNumber} – $
+                    {ticket.totalAmount}
                   </option>
                 ))}
               </select> */}

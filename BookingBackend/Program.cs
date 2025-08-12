@@ -1,5 +1,6 @@
 ﻿using BookingBackend.Models;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,7 +10,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowFrontend",
         policy =>
         {
-            policy.WithOrigins("http://localhost:5173") // React dev server
+            policy.WithOrigins("*") // React dev server
                   .AllowAnyHeader()
                   .AllowAnyMethod();
         });
@@ -30,6 +31,13 @@ builder.Services.AddControllers()
 
 var app = builder.Build();
 
+// 🔽 Run migrations automatically
+//using (var scope = app.Services.CreateScope())
+//{
+//    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+//    db.Database.Migrate();  // This applies pending migrations
+//}
+
 // Configure the HTTP request pipeline
 if (!app.Environment.IsDevelopment())
 {
@@ -47,9 +55,19 @@ app.UseCors("AllowFrontend");
 
 app.UseAuthorization();
 
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+
+//For local backend application 
+
+//app.MapControllerRoute(
+//    name: "default",
+//    pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.MapControllers();
+
+
+//for deployment
+
+app.MapFallbackToFile("index.html");
 
 app.Run();
 

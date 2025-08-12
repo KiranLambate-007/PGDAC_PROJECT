@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using BCrypt = BCrypt.Net.BCrypt;
 namespace BCrypt.Net.Admin;
 
+[ApiController]
+[Route("/")]
 public class AuthController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
