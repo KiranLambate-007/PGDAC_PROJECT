@@ -3,9 +3,8 @@ import { Calendar, Clock, AlertTriangle, CheckCircle } from 'lucide-react';
 import { useBooking } from '../../contexts/BookingContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { ticketService } from '../../services/ticketService';
-
 export const PostponeTicket = () => {
-  const { tickets, updateTicketStatus, setTickets } = useBooking();
+  const { tickets, updateTicketStatus, clearSelectedTickets, setTickets } = useBooking();
   const { user } = useAuth();
   const [selectedTicket, setSelectedTicket] = useState('');
   const [newDate, setNewDate] = useState('');
@@ -20,6 +19,7 @@ export const PostponeTicket = () => {
   // );
 
   React.useEffect(() => {
+    clearSelectedTickets();
     async function fetchTickets() {
       const res = await ticketService.getAllTickets(localStorage.getItem('UserId'));
       setTickets(res);
@@ -27,18 +27,17 @@ export const PostponeTicket = () => {
     fetchTickets();
   }, []); // <-- empty array ensures it runs once on mount only
 
-  const activeTickets = useMemo(() => {
+  const activeTickets = React.useMemo(() => {
     return tickets.filter(ticket => ticket.status === "active");
   }, [tickets]);
-
-  const validateEmail = (value) => {
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!regex.test(value)) {
-      setEmailError('Please enter a valid email address');
-    } else {
-      setEmailError('');
-    }
-  };
+  // const validateEmail = (value) => {
+  //   const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  //   if (!regex.test(value)) {
+  //     setEmailError('Please enter a valid email address');
+  //   } else {
+  //     setEmailError('');
+  //   }
+  // };
 
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
@@ -121,7 +120,7 @@ export const PostponeTicket = () => {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Select Ticket to Postpone
               </label>
-              <select
+              {/* <select
                 value={selectedTicket}
                 onChange={(e) => setSelectedTicket(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -132,6 +131,21 @@ export const PostponeTicket = () => {
                   <option key={ticket.id} value={ticket.id}>
                     Ticket #{ticket.id} - Seats: {ticket.seatNumbers.join(', ')} - ${ticket.totalAmount}
                   </option> */}
+                <option value="ticket.id">Choose a ticket</option>
+                {activeTickets.map((ticket) => (
+                  <option key={ticket.id} value={ticket.id}>
+                    Ticket #{ticket.ticketId} – Seats:{' '}
+                    {ticket.seatNumber} – $
+                    {ticket.totalAmount}
+                  </option>
+                ))}
+              </select> */}
+              <select
+                value={selectedTicket}
+                onChange={(e) => setSelectedTicket(e.target.value)}
+                className="w-full px-3 py-2 border rounded-md"
+                required
+              >
                 <option value="ticket.id">Choose a ticket</option>
                 {activeTickets.map((ticket) => (
                   <option key={ticket.id} value={ticket.id}>
@@ -157,24 +171,33 @@ export const PostponeTicket = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                New Travel Date
+                New Travel Time
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Calendar className="h-5 w-5 text-gray-400" />
-                </div>
+                {/* Today's date displayed as read-only text */}
+                <input
+                  type="text"
+                  value={new Date().toLocaleDateString("en-IN")}
+                  readOnly
+                  className="w-full bg-gray-100 cursor-not-allowed rounded border-gray-300 pl-3 pr-3 py-2 text-gray-700"
+                />
+
+                {/* Hidden date input used for form value, also read-only */}
                 <input
                   type="date"
                   value={newDate}
                   onChange={(e) => setNewDate(e.target.value)}
-                  min={new Date().toISOString().split('T')[0]}
-                  className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  min={new Date().toISOString().split("T")[0]}
+                  readOnly={true}
+                  className="hidden"
                   required
                 />
+                <input type='time'></input>
               </div>
             </div>
 
-            <div>
+
+            {/* <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Postpone To (Email)
               </label>
@@ -187,7 +210,7 @@ export const PostponeTicket = () => {
                 required
               />
               {emailError && <p className="text-red-600 text-sm mt-1">{emailError}</p>}
-            </div>
+            </div> */}
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">

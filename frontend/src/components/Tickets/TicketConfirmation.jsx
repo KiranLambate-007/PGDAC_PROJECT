@@ -79,12 +79,12 @@ export const TicketConfirmation = ({ onStartOver }) => {
             <p className="font-medium">{selectedBus?.busNumber} ({selectedBus?.busType})</p>
           </div>
           <div>
-            <span className="text-gray-600">Departure:</span>
-            <p className="font-medium">{selectedBus?.departureTime}</p>
+            {/* <span className="text-gray-600">Departure:</span>
+            <p className="font-medium">{selectedBus?.departureTime}</p> */}
           </div>
           <div>
             <span className="text-gray-600">Total Amount:</span>
-            <p className="font-medium text-blue-600">${totalAmount.toFixed(2)}</p>
+            <p className="font-medium text-blue-600">&#8377;{totalAmount.toFixed(2)}</p>
           </div>
         </div>
       </div>

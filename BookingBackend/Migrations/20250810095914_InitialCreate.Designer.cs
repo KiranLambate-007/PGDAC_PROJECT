@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BookingBackend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250802183127_AddBusAndSeatModels")]
-    partial class AddBusAndSeatModels
+    [Migration("20250810095914_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -44,11 +44,22 @@ namespace BookingBackend.Migrations
                     b.Property<int>("Capacity")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("DateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<float>("Price")
+                        .HasColumnType("real");
+
+                    b.Property<int>("RouteId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("BusId");
+
+                    b.HasIndex("RouteId");
 
                     b.ToTable("Buses");
                 });
@@ -70,6 +81,9 @@ namespace BookingBackend.Migrations
                     b.Property<int>("RouteId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("RouteId1")
+                        .HasColumnType("int");
+
                     b.Property<TimeSpan>("StartTime")
                         .HasColumnType("time");
 
@@ -79,7 +93,38 @@ namespace BookingBackend.Migrations
 
                     b.HasIndex("RouteId");
 
+                    b.HasIndex("RouteId1");
+
                     b.ToTable("BusRouteAssignments");
+                });
+
+            modelBuilder.Entity("BookingBackend.Models.CancelledTicket", b =>
+                {
+                    b.Property<int>("CancelledId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CancelledId"));
+
+                    b.Property<DateTime>("CancelledAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RefundStatus")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TicketId")
+                        .HasColumnType("int");
+
+                    b.HasKey("CancelledId");
+
+                    b.HasIndex("TicketId");
+
+                    b.ToTable("CancelledTickets");
                 });
 
             modelBuilder.Entity("BookingBackend.Models.Feedback", b =>
@@ -129,16 +174,21 @@ namespace BookingBackend.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PaymentId"));
 
                     b.Property<decimal>("Amount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("Method")
+                    b.Property<DateTime>("PaymentDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PaymentMethod")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("PaymentTime")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("PaymentStatus")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Status")
+                    b.Property<string>("RazorpayPaymentId")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -229,6 +279,39 @@ namespace BookingBackend.Migrations
                     b.ToTable("QRTickets");
                 });
 
+            modelBuilder.Entity("BookingBackend.Models.RegisterRequest", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
+
+                    b.Property<string>("AadharNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("id");
+
+                    b.ToTable("RegisterRequests");
+                });
+
             modelBuilder.Entity("BookingBackend.Models.Route", b =>
                 {
                     b.Property<int>("RouteId")
@@ -254,6 +337,34 @@ namespace BookingBackend.Migrations
                     b.HasKey("RouteId");
 
                     b.ToTable("Routes");
+                });
+
+            modelBuilder.Entity("BookingBackend.Models.Seat", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BusId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsOccupied")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("SeatNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BusId");
+
+                    b.ToTable("Seats");
                 });
 
             modelBuilder.Entity("BookingBackend.Models.Stop", b =>
@@ -292,25 +403,34 @@ namespace BookingBackend.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TicketId"));
 
-                    b.Property<int>("AssignmentId")
+                    b.Property<int?>("AssignmentId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("BookingTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("SeatNumber")
+                    b.Property<int?>("BusId")
                         .HasColumnType("int");
+
+                    b.Property<bool>("IsTransferred")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("SeatNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UserId")
+                    b.Property<int?>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("TicketId");
 
                     b.HasIndex("AssignmentId");
+
+                    b.HasIndex("BusId");
 
                     b.HasIndex("UserId");
 
@@ -370,6 +490,10 @@ namespace BookingBackend.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserId"));
 
+                    b.Property<string>("AadharCardNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -394,6 +518,17 @@ namespace BookingBackend.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("BookingBackend.Models.Bus", b =>
+                {
+                    b.HasOne("BookingBackend.Models.Route", "Route")
+                        .WithMany("Buses")
+                        .HasForeignKey("RouteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Route");
+                });
+
             modelBuilder.Entity("BookingBackend.Models.BusRouteAssignment", b =>
                 {
                     b.HasOne("BookingBackend.Models.Bus", "Bus")
@@ -403,14 +538,29 @@ namespace BookingBackend.Migrations
                         .IsRequired();
 
                     b.HasOne("BookingBackend.Models.Route", "Route")
-                        .WithMany("BusRouteAssignments")
+                        .WithMany()
                         .HasForeignKey("RouteId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("BookingBackend.Models.Route", null)
+                        .WithMany("BusRouteAssignments")
+                        .HasForeignKey("RouteId1");
 
                     b.Navigation("Bus");
 
                     b.Navigation("Route");
+                });
+
+            modelBuilder.Entity("BookingBackend.Models.CancelledTicket", b =>
+                {
+                    b.HasOne("BookingBackend.Models.Ticket", "Ticket")
+                        .WithMany()
+                        .HasForeignKey("TicketId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Ticket");
                 });
 
             modelBuilder.Entity("BookingBackend.Models.Feedback", b =>
@@ -477,6 +627,17 @@ namespace BookingBackend.Migrations
                     b.Navigation("Ticket");
                 });
 
+            modelBuilder.Entity("BookingBackend.Models.Seat", b =>
+                {
+                    b.HasOne("BookingBackend.Models.Bus", "Bus")
+                        .WithMany()
+                        .HasForeignKey("BusId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Bus");
+                });
+
             modelBuilder.Entity("BookingBackend.Models.Stop", b =>
                 {
                     b.HasOne("BookingBackend.Models.Route", "Route")
@@ -492,17 +653,19 @@ namespace BookingBackend.Migrations
                 {
                     b.HasOne("BookingBackend.Models.BusRouteAssignment", "Assignment")
                         .WithMany()
-                        .HasForeignKey("AssignmentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("AssignmentId");
+
+                    b.HasOne("BookingBackend.Models.Bus", "Bus")
+                        .WithMany()
+                        .HasForeignKey("BusId");
 
                     b.HasOne("BookingBackend.Models.User", "User")
                         .WithMany("Tickets")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("UserId");
 
                     b.Navigation("Assignment");
+
+                    b.Navigation("Bus");
 
                     b.Navigation("User");
                 });
@@ -550,6 +713,8 @@ namespace BookingBackend.Migrations
             modelBuilder.Entity("BookingBackend.Models.Route", b =>
                 {
                     b.Navigation("BusRouteAssignments");
+
+                    b.Navigation("Buses");
 
                     b.Navigation("Stops");
                 });

@@ -5,7 +5,7 @@
 namespace BookingBackend.Migrations
 {
     /// <inheritdoc />
-    public partial class AddCancelledTickets : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
